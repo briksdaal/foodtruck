@@ -1,0 +1,13 @@
+<ul>
+  <% perishables.slice(0,5).forEach((p) => { %>
+  <li>
+    <a href="<%= p.url %>"><%= p.perishable.title %></a> - <%= date_string %>:
+    <%= p.ddmmyy_dateLastUse %>
+  </li>
+  <% }) %>
+</ul>
+<% if (perishables.length > 5) { %>
+<div class="to-full-list-link">
+  <a href="/perishables">To all perishables</a>
+</div>
+<% } %>

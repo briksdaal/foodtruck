@@ -1,0 +1,12 @@
+<ul>
+  <% recipes.slice(0,5).forEach((r) => { %>
+  <li>
+    <a href="<%= r.url %>"><%= r.title %></a>
+  </li>
+  <% }) %>
+</ul>
+<% if (recipes.length > 5) { %>
+<div class="to-full-list-link">
+  <a href="/recipes">To all recipes</a>
+</div>
+<% } %>

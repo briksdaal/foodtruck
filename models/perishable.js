@@ -14,7 +14,7 @@ const PerishableSchema = new Schema({
 });
 
 PerishableSchema.virtual('url').get(function () {
-  return `/perishable/${this._id}`;
+  return `/perishables/${this._id}`;
 });
 
 module.exports = mongoose.model('Perishable', PerishableSchema);

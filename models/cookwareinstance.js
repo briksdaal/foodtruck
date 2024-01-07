@@ -15,7 +15,7 @@ const CookwareInstanceSchema = new Schema({
 });
 
 CookwareInstanceSchema.virtual('url').get(function () {
-  return `/cookwareinstance/${this._id}`;
+  return `/cookwareinstances/${this._id}`;
 });
 
 module.exports = mongoose.model('CookwareInstance', CookwareInstanceSchema);

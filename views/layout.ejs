@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/stylesheets/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="left-sidebar fifth-width-container">
+        <h2>Food Truck</h2>
+        <ul class="list-style-none">
+          <li><a href="/">Home</a></li>
+          <li><a href="/perishableinstances">Perishables</a></li>
+          <li><a href="/cookwareinstances">Cookware</a></li>
+          <li><a href="/recipes">Recipes</a></li>
+          <li><a href="/perishables">Perishable Types</a></li>
+          <li><a href="/categories">Perishable Categories</a></li>
+          <li><a href="/cookware">Cookware Types</a></li>
+        </ul>
+      </div>
+      <div class="content-container full-width">
+        <div class="content-header full-width">
+          <h1><%= title %></h1>
+          <% if (locals.createUrl) { %>
+          <a href="<%= createUrl %>">Create New</a>
+          <% } %>
+        </div>
+        <div class="content-main"><%-body%></div>
+      </div>
+      <div class="fifth-width-container"></div>
+    </div>
+  </body>
+</html>

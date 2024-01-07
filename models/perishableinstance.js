@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { DateTime } = require('luxon');
 
 const Schema = mongoose.Schema;
 
@@ -18,7 +19,11 @@ const PerishableInstanceSchema = new Schema({
 });
 
 PerishableInstanceSchema.virtual('url').get(function () {
-  return `/perishableinstance/${this._id}`;
+  return `/perishableinstances/${this._id}`;
+});
+
+PerishableInstanceSchema.virtual('ddmmyy_dateLastUse').get(function () {
+  return DateTime.fromJSDate(this.dateLastUse).toFormat("dd'/'MM'/'yy");
 });
 
 module.exports = mongoose.model('PerishableInstance', PerishableInstanceSchema);

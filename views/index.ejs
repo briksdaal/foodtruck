@@ -1,11 +1,33 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-  </head>
-  <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
-  </body>
-</html>
+<div class="grid-container">
+  <div class="list-block">
+    <h3>Perishables In Stock</h3>
+    <%- include('lists/perishables', {perishables: before_last_date_perishables,
+    date_string: 'Use By'}) %>
+  </div>
+
+  <div class="list-block">
+    <h3>Usable Cookware</h3>
+    <%- include('lists/cookware', {cookware: usable_cookware}) %>
+  </div>
+
+  <div class="list-block">
+    <h3>Recipes</h3>
+    <%- include('lists/recipes', {recipes: recipes_list}) %>
+  </div>
+
+  <div class="list-block">
+    <h3>Cookware In Maintenance</h3>
+    <%- include('lists/cookware', {cookware: maintenance_cookware}) %>
+  </div>
+
+  <div class="list-block">
+    <h3>Cookware Needing Maintenance</h3>
+    <%- include('lists/cookware', {cookware: not_usable_cookware}) %>
+  </div>
+
+  <div class="list-block">
+    <h3>Perishables Needing Disposal</h3>
+    <%- include('lists/perishables', {perishables: after_last_date_perishables,
+    date_string: 'Last Date Was'}) %>
+  </div>
+</div>

@@ -22,8 +22,16 @@ PerishableInstanceSchema.virtual('url').get(function () {
   return `/perishableinstances/${this._id}`;
 });
 
+PerishableInstanceSchema.virtual('ddmmyy_dateBought').get(function () {
+  return DateTime.fromJSDate(this.dateBought).toFormat("dd'/'MM'/'yy");
+});
+
 PerishableInstanceSchema.virtual('ddmmyy_dateLastUse').get(function () {
   return DateTime.fromJSDate(this.dateLastUse).toFormat("dd'/'MM'/'yy");
+});
+
+PerishableInstanceSchema.virtual('past_date').get(function () {
+  return this.dateLastUse < Date.now();
 });
 
 module.exports = mongoose.model('PerishableInstance', PerishableInstanceSchema);

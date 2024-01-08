@@ -1,3 +1,4 @@
+<% if (categories.length > 0) { %>
 <ul>
   <% categories.forEach((c) => { %>
   <li>
@@ -5,3 +6,7 @@
   </li>
   <% }) %>
 </ul>
+
+<% } else { %>
+<p>None Defined</p>
+<% } %>

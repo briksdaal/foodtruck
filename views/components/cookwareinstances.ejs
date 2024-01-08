@@ -1,8 +1,23 @@
+<% if (cookware.length > 0) { %>
 <ul>
   <% cookware.forEach((c) => {%>
   <li>
     <a href="<%= c.url %>"><%= c.cookware.title %></a> <%= (c.description) ? `-
-    ${c.description}` : '' %>
+    ${c.description}` : '' %> <% if (locals.condition) {%>
+    <p>
+      Condition: <% if (c.condition === 'Usable') { %>
+      <span class="usable"><%= c.condition %></span>
+      <% } else if (c.condition === 'Maintenance') { %>
+      <span class="maintenance"><%= c.condition %></span>
+      <% } else { %>
+      <span class="not-usable"><%= c.condition %></span>
+      <% } %>
+    </p>
+    <% } %>
   </li>
   <% }) %>
 </ul>
+
+<% } else { %>
+<p>None In Stock</p>
+<% } %>

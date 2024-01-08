@@ -1,0 +1,34 @@
+<h3>Description</h3>
+<p>
+  <% if (recipe.description) { %> <%= recipe.description %> <% } else { %> No
+  Description <% } %>
+</p>
+
+<h3>Required Cookware</h3>
+<div>
+  <% if (recipe.cookware && recipe.cookware.length) { %> <%-
+  include('components/cookware', {cookware: recipe.cookware}) %> <% } else { %>
+  None <% } %>
+</div>
+
+<h3>Ingredients</h3>
+<div>
+  <ul>
+    <% recipe.ingredients.forEach((i) => {%>
+    <li>
+      <a href="<%= i.perishable.url %>"><%= i.perishable.title %></a> - <%=
+      i.amount %> <%- include('components/measure', {measureType:
+      i.perishable.measureType}) %>
+    </li>
+    <% }) %>
+  </ul>
+</div>
+
+<div class="links">
+  <p>
+    <a href="<%= recipe.url %>/delete">Delete Recipe</a>
+  </p>
+  <p>
+    <a href="<%= recipe.url %>/update">Edit Recipe</a>
+  </p>
+</div>

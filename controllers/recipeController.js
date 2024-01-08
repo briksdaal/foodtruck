@@ -13,7 +13,21 @@ exports.recipe_list = asyncHandler(async (req, res, next) => {
 
 // Display detail page for a specific recipe
 exports.recipe_detail = asyncHandler(async (req, res, next) => {
-  res.send(`NOT IMPLEMENTED: Recipe detail: ${req.params.id}`);
+  const recipe = await Recipe.findById(req.params.id)
+    .populate('cookware ingredients.perishable')
+    .exec();
+
+  if (recipe === null) {
+    // no results
+    const err = new Error('Recipe Not Found');
+    err.status = 404;
+    return next(err);
+  }
+
+  res.render('recipe_detail', {
+    title: recipe.title,
+    recipe,
+  });
 });
 
 // Dispaly recipe create form on GET

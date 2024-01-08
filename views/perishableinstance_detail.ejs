@@ -1,0 +1,44 @@
+<h3>Perishable Type</h3>
+<p>
+  <a href="<%= perishable_instance.perishable.url %>"
+    ><%= perishable_instance.perishable.title %></a
+  >
+  <% if (perishable_instance.perishable.category) { %> -
+  <a href="<%= perishable_instance.perishable.category.url %>"
+    ><%= perishable_instance.perishable.category.title %></a
+  >
+  <% } %>
+</p>
+<h3>Amount</h3>
+<p>
+  <%= perishable_instance.amount %> <%- include('components/measure',
+  {measureType: perishable_instance.perishable.measureType}) %>
+</p>
+<h3>Date Bought</h3>
+<p>
+  <% if (perishable_instance.dateBought) { %> <%=
+  perishable_instance.ddmmyy_dateBought %> <% } else { %> No Date Listed <% } %>
+</p>
+<h3>Use By</h3>
+<p>
+  <% if (perishable_instance.dateLastUse) { %> <%=
+  perishable_instance.ddmmyy_dateLastUse %> - <% if
+  (perishable_instance.past_date) { %>
+  <span class="not-usable">Requires Disposal!</span> <% } else { %>
+  <span class="usable">Safe to Use</span> <% } %> <% } else { %> No Date Listed
+  <% } %>
+</p>
+<h3>Purchased At</h3>
+<p>
+  <% if (perishable_instance.placeBought) { %> <%=
+  perishable_instance.placeBought %> <% } else { %> None Listed <% } %>
+</p>
+
+<div class="links">
+  <p>
+    <a href="<%= perishable_instance.url %>/delete">Delete Perishable</a>
+  </p>
+  <p>
+    <a href="<%= perishable_instance.url %>/update">Edit Perishable</a>
+  </p>
+</div>

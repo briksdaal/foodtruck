@@ -58,6 +58,15 @@ h3 {
   gap: 4rem;
 }
 
+.seperator {
+  height: 2px;
+  width: 100%;
+  max-width: 80px;
+  border-radius: 20px;
+  margin: 1rem 0;
+  background: #7c7c7c7c;
+}
+
 .content-header {
   display: flex;
   gap: 8rem;
@@ -70,4 +79,28 @@ h3 {
 
 .to-full-list-link {
   margin-top: 0.5rem;
+}
+
+.usable {
+  color: #4ad12f;
+}
+
+.maintenance {
+  color: #efbd32;
+}
+
+.not-usable {
+  color: #c03232;
+}
+
+.links {
+  margin-top: 2rem;
+}
+
+.links p {
+  margin-top: 0.5rem;
+}
+
+.content-main li {
+  margin-bottom: 0.5rem;
 }

@@ -1,4 +1,5 @@
 const Cookware = require('../models/cookware');
+const CookwareInstance = require('../models/cookwareinstance');
 const asyncHandler = require('express-async-handler');
 
 // Display list of all Cookware
@@ -13,7 +14,26 @@ exports.cookware_list = asyncHandler(async (req, res, next) => {
 
 // Display detail page for a specific Cookware
 exports.cookware_detail = asyncHandler(async (req, res, next) => {
-  res.send(`NOT IMPLEMENTED: Cookware detail: ${req.params.id}`);
+  const [cookware, cookwareInstances] = await Promise.all([
+    Cookware.findById(req.params.id).exec(),
+    CookwareInstance.find({ cookware: req.params.id }, 'description condition')
+      .populate('cookware')
+      .sort({ condition: -1 })
+      .exec(),
+  ]);
+
+  if (cookware === null) {
+    // no results
+    const err = new Error('Cookware Type Not Found');
+    err.status = 404;
+    return next(err);
+  }
+
+  res.render('cookware_detail', {
+    title: `Cookware Type Details: ${cookware.title}`,
+    cookware_type: cookware,
+    cookware_instances: cookwareInstances,
+  });
 });
 
 // Dispaly Cookware create form on GET

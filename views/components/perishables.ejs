@@ -1,3 +1,4 @@
+<% if (perishables.length) { %>
 <ul>
   <% perishables.forEach((p) => {%>
   <li>
@@ -6,3 +7,7 @@
   </li>
   <% }) %>
 </ul>
+
+<% } else { %>
+<p>None Defined</p>
+<% } %>

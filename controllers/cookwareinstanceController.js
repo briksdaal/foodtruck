@@ -13,8 +13,6 @@ exports.cookwareinstance_list = asyncHandler(async (req, res, next) => {
     sortByTitle('cookware', 'title')
   );
 
-  console.log(sortedAllCookwareInstances.map((c) => c.description));
-
   res.render('cookwareinstance_list', {
     title: 'Cookware List',
     cookwareinstance_list: sortedAllCookwareInstances,
@@ -23,7 +21,21 @@ exports.cookwareinstance_list = asyncHandler(async (req, res, next) => {
 
 // Display detail page for a specific Cookware Instance
 exports.cookwareinstance_detail = asyncHandler(async (req, res, next) => {
-  res.send(`NOT IMPLEMENTED: Cookware Instance detail: ${req.params.id}`);
+  const cookwareInstance = await CookwareInstance.findById(req.params.id)
+    .populate('cookware')
+    .exec();
+
+  if (cookwareInstance === null) {
+    // no results
+    const err = new Error('Cookware Not Found');
+    err.status = 404;
+    return next(err);
+  }
+
+  res.render('cookwareinstance_detail', {
+    title: `${cookwareInstance.cookware.title} - ${cookwareInstance._id}`,
+    cookware_instance: cookwareInstance,
+  });
 });
 
 // Dispaly Cookware Instance create form on GET

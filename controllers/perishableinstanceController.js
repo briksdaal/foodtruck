@@ -19,7 +19,26 @@ exports.perishableinstance_list = asyncHandler(async (req, res, next) => {
 
 // Display detail page for a specific Perishable Instance
 exports.perishableinstance_detail = asyncHandler(async (req, res, next) => {
-  res.send(`NOT IMPLEMENTED: Perishable Instance detail: ${req.params.id}`);
+  const perishableInstance = await PerishableInstance.findById(req.params.id)
+    .populate({
+      path: 'perishable',
+      populate: {
+        path: 'category',
+      },
+    })
+    .exec();
+
+  if (perishableInstance === null) {
+    // no results
+    const err = new Error('Perishable Not Found');
+    err.status = 404;
+    return next(err);
+  }
+
+  res.render('perishableinstance_detail', {
+    title: `${perishableInstance.perishable.title} - ${perishableInstance._id}`,
+    perishable_instance: perishableInstance,
+  });
 });
 
 // Dispaly Perishable Instance create form on GET

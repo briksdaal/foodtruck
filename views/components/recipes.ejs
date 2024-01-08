@@ -1,3 +1,4 @@
+<% if (recipes.length > 0) { %>
 <ul>
   <% recipes.forEach((r) => { %>
   <li>
@@ -5,3 +6,7 @@
   </li>
   <% }) %>
 </ul>
+
+<% } else { %>
+<p>None Defined</p>
+<% } %>

@@ -1,0 +1,11 @@
+<h3>Perishable Types In Category</h3>
+<%- include('components/perishables', {perishables: category_perishables}) %>
+
+<div class="links">
+  <p>
+    <a href="<%= category.url %>/delete">Delete Category</a>
+  </p>
+  <p>
+    <a href="<%= category.url %>/update">Edit Category</a>
+  </p>
+</div>

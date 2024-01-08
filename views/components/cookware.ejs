@@ -1,3 +1,4 @@
+<% if (cookware.length > 0) { %>
 <ul>
   <% cookware.forEach((c) => {%>
   <li>
@@ -6,3 +7,7 @@
   </li>
   <% }) %>
 </ul>
+
+<% } else { %>
+<p>None Defined</p>
+<% } %>

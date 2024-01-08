@@ -1,4 +1,5 @@
 const Perishable = require('../models/perishable');
+const PerishableInstance = require('../models/perishableinstance');
 const asyncHandler = require('express-async-handler');
 
 // Display list of all Perishables
@@ -13,7 +14,35 @@ exports.perishable_list = asyncHandler(async (req, res, next) => {
 
 // Display detail page for a specific Perishable
 exports.perishable_detail = asyncHandler(async (req, res, next) => {
-  res.send(`NOT IMPLEMENTED: Perishable detail: ${req.params.id}`);
+  const [perishable, perishableInstances] = await Promise.all([
+    Perishable.findById(req.params.id).populate('category').exec(),
+    PerishableInstance.find({ perishable: req.params.id }, 'dateLastUse')
+      .populate('perishable', 'title')
+      .sort({ dateLastUse: 1 })
+      .exec(),
+  ]);
+
+  if (perishable === null) {
+    // no results
+    const err = new Error('Perishable Type Not Found');
+    err.status = 404;
+    return next(err);
+  }
+
+  const before_last_date_perishables = perishableInstances.filter(
+    (p) => p.dateLastUse >= Date.now()
+  );
+
+  const after_last_date_perishables = perishableInstances.filter(
+    (p) => p.dateLastUse < Date.now()
+  );
+
+  res.render('perishable_detail', {
+    title: `Perishable Type Details: ${perishable.title}`,
+    perishable_type: perishable,
+    before_last_date_perishables,
+    after_last_date_perishables,
+  });
 });
 
 // Dispaly Perishable create form on GET

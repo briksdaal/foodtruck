@@ -1,0 +1,12 @@
+<h3>Cookware In Stock</h3>
+<%- include('components/cookwareinstances', {cookware: cookware_instances,
+condition: true}) %>
+
+<div class="links">
+  <p>
+    <a href="<%= cookware_type.url %>/delete">Delete Cookware Type</a>
+  </p>
+  <p>
+    <a href="<%= cookware_type.url %>/update">Edit Cookware Type</a>
+  </p>
+</div>

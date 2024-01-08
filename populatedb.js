@@ -72,7 +72,7 @@ async function createCategories() {
     categoryCreate(1, 'Vegetables'),
     categoryCreate(2, 'Meat'),
     categoryCreate(3, 'Dairy'),
-    categoryCreate(4, 'Seasonigs'),
+    categoryCreate(4, 'Seasonings'),
     categoryCreate(5, 'Baked Goods'),
   ]);
 }
@@ -301,6 +301,22 @@ async function createPerishableInstances() {
       false,
       800,
       "Farmer's Market"
+    ),
+    perishableInstanceCreate(
+      6,
+      perishables[9],
+      (() => {
+        const date = new Date();
+        date.setDate(date.getDate() - 10);
+        return date;
+      })(),
+      (() => {
+        const date = new Date();
+        date.setDate(date.getDate() - 5);
+        return date;
+      })(),
+      800,
+      'HaMakolet Shel Sami'
     ),
   ]);
 }

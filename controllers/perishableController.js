@@ -3,7 +3,12 @@ const asyncHandler = require('express-async-handler');
 
 // Display list of all Perishables
 exports.perishable_list = asyncHandler(async (req, res, next) => {
-  res.send('NOT IMPLEMENTED: Perishable list');
+  const allPerishables = await Perishable.find({}).sort({ title: 1 }).exec();
+
+  res.render('perishable_list', {
+    title: 'Perishable Types List',
+    perishable_list: allPerishables,
+  });
 });
 
 // Display detail page for a specific Perishable

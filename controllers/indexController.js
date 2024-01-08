@@ -3,6 +3,8 @@ const CookwareInstance = require('../models/cookwareinstance');
 const Recipes = require('../models/recipe');
 const asyncHandler = require('express-async-handler');
 
+const sortByTitle = require('../helpers/sortByTitle');
+
 // Display homepage
 exports.index = asyncHandler(async (req, res, next) => {
   const [allPerishableInstances, allCookwareInstances, allRecipes] =
@@ -11,31 +13,13 @@ exports.index = asyncHandler(async (req, res, next) => {
         .populate('perishable', 'title')
         .sort({ dateLastUse: 1 })
         .exec(),
-      CookwareInstance.aggregate([
-        { $match: {} },
-        {
-          $lookup: {
-            from: 'cookwares',
-            localField: 'cookware',
-            foreignField: '_id',
-            as: 'cookware',
-          },
-        },
-        {
-          $project: {
-            description: 1,
-            condition: 1,
-            cookware: { $arrayElemAt: ['$cookware', 0] },
-          },
-        },
-        {
-          $sort: {
-            'cookware.title': 1,
-          },
-        },
-      ]).exec(),
+      CookwareInstance.find({}).populate('cookware').exec(),
       Recipes.find({}, 'title').sort({ title: 1 }).exec(),
     ]);
+
+  const sortedAllCookwareInstances = allCookwareInstances.sort(
+    sortByTitle('cookware', 'title')
+  );
 
   const before_last_date_perishables = allPerishableInstances.filter(
     (p) => p.dateLastUse >= Date.now()
@@ -45,15 +29,15 @@ exports.index = asyncHandler(async (req, res, next) => {
     (p) => p.dateLastUse < Date.now()
   );
 
-  const usable_cookware = allCookwareInstances.filter(
+  const usable_cookware = sortedAllCookwareInstances.filter(
     (c) => c.condition === 'Usable'
   );
 
-  const maintenance_cookware = allCookwareInstances.filter(
+  const maintenance_cookware = sortedAllCookwareInstances.filter(
     (c) => c.condition === 'Maintenance'
   );
 
-  const not_usable_cookware = allCookwareInstances.filter(
+  const not_usable_cookware = sortedAllCookwareInstances.filter(
     (c) => c.condition === 'No Longer Usable'
   );
 

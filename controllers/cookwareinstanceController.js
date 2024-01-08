@@ -1,9 +1,24 @@
 const CookwareInstance = require('../models/cookwareinstance');
 const asyncHandler = require('express-async-handler');
 
+const sortByTitle = require('../helpers/sortByTitle');
+
 // Display list of all Cookware Instances
 exports.cookwareinstance_list = asyncHandler(async (req, res, next) => {
-  res.send('NOT IMPLEMENTED: Cookware Instance list');
+  const allCookwareInstances = await CookwareInstance.find({})
+    .populate('cookware', 'title')
+    .exec();
+
+  const sortedAllCookwareInstances = allCookwareInstances.sort(
+    sortByTitle('cookware', 'title')
+  );
+
+  console.log(sortedAllCookwareInstances.map((c) => c.description));
+
+  res.render('cookwareinstance_list', {
+    title: 'Cookware List',
+    cookwareinstance_list: sortedAllCookwareInstances,
+  });
 });
 
 // Display detail page for a specific Cookware Instance

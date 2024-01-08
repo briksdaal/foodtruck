@@ -1,0 +1,20 @@
+function sortByTitle(object, title) {
+  if (object)
+    return (a, b) => {
+      if (!a[object][title]) return 1;
+      if (!b[object][title]) return -1;
+      if (a[object][title] > b[object][title]) return 1;
+      else if (a[object][title] < b[object][title]) return -1;
+      else return 0;
+    };
+
+  return (a, b) => {
+    if (!a[title]) return 1;
+    if (!b[title]) return -1;
+    if (a[title] > b[title]) return 1;
+    else if (a[title] < b[title]) return -1;
+    else return 0;
+  };
+}
+
+module.exports = sortByTitle;

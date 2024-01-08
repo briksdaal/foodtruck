@@ -3,7 +3,12 @@ const asyncHandler = require('express-async-handler');
 
 // Display list of all Recipes
 exports.recipe_list = asyncHandler(async (req, res, next) => {
-  res.send('NOT IMPLEMENTED: Recipe list');
+  const allRecipes = await Recipe.find({}).sort({ title: 1 }).exec();
+
+  res.render('recipe_list', {
+    title: 'Recipes List',
+    recipe_list: allRecipes,
+  });
 });
 
 // Display detail page for a specific recipe

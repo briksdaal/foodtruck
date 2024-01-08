@@ -1,0 +1,8 @@
+<ul>
+  <% cookware.forEach((c) => {%>
+  <li>
+    <a href="<%= c.url %>"><%= c.title %></a> <%= (c.description) ? `-
+    ${c.description}` : '' %>
+  </li>
+  <% }) %>
+</ul>

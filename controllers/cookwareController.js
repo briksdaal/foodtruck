@@ -3,7 +3,12 @@ const asyncHandler = require('express-async-handler');
 
 // Display list of all Cookware
 exports.cookware_list = asyncHandler(async (req, res, next) => {
-  res.send('NOT IMPLEMENTED: Cookware list');
+  const allCookware = await Cookware.find({}).sort({ title: 1 }).exec();
+
+  res.render('cookware_list', {
+    title: 'Cookware Types List',
+    cookware_list: allCookware,
+  });
 });
 
 // Display detail page for a specific Cookware

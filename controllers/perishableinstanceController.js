@@ -3,7 +3,18 @@ const asyncHandler = require('express-async-handler');
 
 // Display list of all Perishable Instances
 exports.perishableinstance_list = asyncHandler(async (req, res, next) => {
-  res.send('NOT IMPLEMENTED: Perishable Instance list');
+  const allPerishableInstances = await PerishableInstance.find(
+    {},
+    'dateLastUse'
+  )
+    .populate('perishable', 'title')
+    .sort({ dateLastUse: 1 })
+    .exec();
+
+  res.render('perishableinstance_list', {
+    title: 'Perishables List',
+    perishableinstance_list: allPerishableInstances,
+  });
 });
 
 // Display detail page for a specific Perishable Instance

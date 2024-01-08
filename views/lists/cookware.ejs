@@ -1,13 +1,8 @@
 <ul>
-  <% cookware.slice(0,5).forEach((c) => {%>
+  <% cookware.forEach((c) => {%>
   <li>
     <a href="<%= c.url %>"><%= c.cookware.title %></a> <%= (c.description) ? `-
     ${c.description}` : '' %>
   </li>
   <% }) %>
 </ul>
-<% if (cookware.length > 5) { %>
-<div class="to-full-list-link">
-  <a href="/cookwareinstances">To all cookware</a>
-</div>
-<% } %>

@@ -1,33 +1,63 @@
 <div class="grid-container">
   <div class="list-block">
     <h3>Perishables In Stock</h3>
-    <%- include('lists/perishables', {perishables: before_last_date_perishables,
-    date_string: 'Use By'}) %>
+    <%- include('lists/perishables', {perishables:
+    before_last_date_perishables.slice(0,5), date_string: 'Use By'}) %> <% if
+    (before_last_date_perishables.length > 5) { %>
+    <div class="to-full-list-link">
+      <a href="/perishables">To all perishables</a>
+    </div>
+    <% } %>
   </div>
 
   <div class="list-block">
     <h3>Usable Cookware</h3>
-    <%- include('lists/cookware', {cookware: usable_cookware}) %>
+    <%- include('lists/cookware', {cookware: usable_cookware.slice(0,5)}) %> <%
+    if (usable_cookware.length > 5) { %>
+    <div class="to-full-list-link">
+      <a href="/cookwareinstances">To all cookware</a>
+    </div>
+    <% } %>
   </div>
 
   <div class="list-block">
     <h3>Recipes</h3>
-    <%- include('lists/recipes', {recipes: recipes_list}) %>
+    <%- include('lists/recipes', {recipes: recipes_list.slice(0,5)}) %> <% if
+    (recipes_list.length > 5) { %>
+    <div class="to-full-list-link">
+      <a href="/recipes">To all recipes</a>
+    </div>
+    <% } %>
   </div>
 
   <div class="list-block">
     <h3>Cookware In Maintenance</h3>
-    <%- include('lists/cookware', {cookware: maintenance_cookware}) %>
+    <%- include('lists/cookware', {cookware: maintenance_cookware.slice(0,5)})
+    %> <% if (maintenance_cookware.length > 5) { %>
+    <div class="to-full-list-link">
+      <a href="/cookwareinstances">To all cookware</a>
+    </div>
+    <% } %>
   </div>
 
   <div class="list-block">
     <h3>Cookware Needing Maintenance</h3>
-    <%- include('lists/cookware', {cookware: not_usable_cookware}) %>
+    <%- include('lists/cookware', {cookware: not_usable_cookware.slice(0,5)}) %>
+    <% if (not_usable_cookware.length > 5) { %>
+    <div class="to-full-list-link">
+      <a href="/cookwareinstances">To all cookware</a>
+    </div>
+    <% } %>
   </div>
 
   <div class="list-block">
     <h3>Perishables Needing Disposal</h3>
-    <%- include('lists/perishables', {perishables: after_last_date_perishables,
-    date_string: 'Last Date Was'}) %>
+    <%- include('lists/perishables', {perishables:
+    after_last_date_perishables.slice(0,5), date_string: 'Last Date Was'}) %> <%
+    if (after_last_date_perishables.length > 5) { %>
+    <div class="to-full-list-link">
+      <a href="/perishables">To all perishables</a>
+    </div>
+    <% } %>
   </div>
 </div>

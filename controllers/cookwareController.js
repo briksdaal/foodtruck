@@ -1,6 +1,7 @@
 const Cookware = require('../models/cookware');
 const CookwareInstance = require('../models/cookwareinstance');
 const asyncHandler = require('express-async-handler');
+const { body, validationResult } = require('express-validator');
 
 // Display list of all Cookware
 exports.cookware_list = asyncHandler(async (req, res, next) => {
@@ -38,14 +39,61 @@ exports.cookware_detail = asyncHandler(async (req, res, next) => {
 });
 
 // Dispaly Cookware create form on GET
-exports.cookware_create_get = asyncHandler(async (req, res, next) => {
-  res.send('NOT IMPLEMENTED: Cookware create GET');
-});
+exports.cookware_create_get = (req, res, next) => {
+  res.render('cookware_form', {
+    title: 'Create New Cookware Type',
+  });
+};
 
 // Handle Cookware create on POST
-exports.cookware_create_post = asyncHandler(async (req, res, next) => {
-  res.send('NOT IMPLEMENTED: Cookware create POST');
-});
+exports.cookware_create_post = [
+  // Validate and sanitize
+  body('title', 'Cookware type title must contain at least 3 characters')
+    .trim()
+    .isLength({ min: 3 })
+    .escape(),
+  body('description', 'Description must contain at least 3 characters')
+    .optional({ values: 'falsy' })
+    .trim()
+    .isLength({ min: 3 })
+    .escape(),
+  // Process request
+  asyncHandler(async (req, res, next) => {
+    // Extract the validation errors from a request.
+    const errors = validationResult(req);
+
+    // Create a cookware object with escaped and trimmed data.
+    const cookware = new Cookware({
+      title: req.body.title,
+      description: req.body.description,
+    });
+
+    console.log(errors);
+    if (!errors.isEmpty()) {
+      // There are errors. Render the form again with sanitized values/error messages.
+      res.render('cookware_form', {
+        title: 'Create New Cookware Type',
+        cookware,
+        errors: errors.array(),
+      });
+      return;
+    } else {
+      // Data from form is valid.
+      // Check if Cookware with same name already exists.
+      const cookwareExists = await Cookware.findOne({
+        title: req.body.title,
+      }).exec();
+      if (cookwareExists) {
+        // Cookware exists, redirect to its detail page.
+        res.redirect(cookwareExists.url);
+      } else {
+        await cookware.save();
+        // New cookware saved. Redirect to Cookware detail page.
+        res.redirect(cookware.url);
+      }
+    }
+  }),
+];
 
 // Dispaly Cookware delete form on GET
 exports.cookware_delete_get = asyncHandler(async (req, res, next) => {

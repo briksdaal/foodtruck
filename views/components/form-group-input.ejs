@@ -1,0 +1,9 @@
+<label for="<%= name.toLowerCase() %>"><%= name %>:</label>
+<input
+  type="text"
+  id="<%= name.toLowerCase() %>"
+  name="<%= name.toLowerCase() %>"
+  class="form-control"
+  placeholder="<%= placeholder %>"
+  value="<%= item ? item[name.toLowerCase()] : '' %>"
+/>

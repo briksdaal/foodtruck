@@ -14,6 +14,7 @@ exports.perishableinstance_list = asyncHandler(async (req, res, next) => {
   res.render('perishableinstance_list', {
     title: 'Perishables List',
     perishableinstance_list: allPerishableInstances,
+    createUrl: '/perishableinstances/create',
   });
 });
 

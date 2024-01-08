@@ -8,6 +8,7 @@ exports.recipe_list = asyncHandler(async (req, res, next) => {
   res.render('recipe_list', {
     title: 'Recipes List',
     recipe_list: allRecipes,
+    createUrl: '/recipes/create',
   });
 });
 

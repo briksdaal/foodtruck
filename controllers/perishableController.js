@@ -9,6 +9,7 @@ exports.perishable_list = asyncHandler(async (req, res, next) => {
   res.render('perishable_list', {
     title: 'Perishable Types List',
     perishable_list: allPerishables,
+    createUrl: '/perishables/create',
   });
 });
 

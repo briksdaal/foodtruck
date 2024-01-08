@@ -16,6 +16,7 @@ exports.cookwareinstance_list = asyncHandler(async (req, res, next) => {
   res.render('cookwareinstance_list', {
     title: 'Cookware List',
     cookwareinstance_list: sortedAllCookwareInstances,
+    createUrl: '/cookwareinstances/create',
   });
 });
 

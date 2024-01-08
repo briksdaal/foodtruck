@@ -9,6 +9,7 @@ exports.cookware_list = asyncHandler(async (req, res, next) => {
   res.render('cookware_list', {
     title: 'Cookware Types List',
     cookware_list: allCookware,
+    createUrl: '/cookware/create',
   });
 });
 

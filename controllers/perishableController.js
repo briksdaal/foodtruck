@@ -1,6 +1,8 @@
 const Perishable = require('../models/perishable');
 const PerishableInstance = require('../models/perishableinstance');
+const Category = require('../models/category');
 const asyncHandler = require('express-async-handler');
+const { body, validationResult } = require('express-validator');
 
 // Display list of all Perishables
 exports.perishable_list = asyncHandler(async (req, res, next) => {
@@ -48,13 +50,63 @@ exports.perishable_detail = asyncHandler(async (req, res, next) => {
 
 // Dispaly Perishable create form on GET
 exports.perishable_create_get = asyncHandler(async (req, res, next) => {
-  res.send('NOT IMPLEMENTED: Perishable create GET');
+  const allCategories = await Category.find({}).sort({ title: 1 }).exec();
+
+  res.render('perishable_form', {
+    title: 'Create New Perishable Type',
+    category_list: allCategories,
+  });
 });
 
 // Handle Perishable create on POST
-exports.perishable_create_post = asyncHandler(async (req, res, next) => {
-  res.send('NOT IMPLEMENTED: Perishable create POST');
-});
+exports.perishable_create_post = [
+  // Validate and sanitize
+  body('title', 'Title must contain at least 3 characters')
+    .trim()
+    .isLength({ min: 3 })
+    .escape(),
+  body('description', 'Description must contain at least 3 characters')
+    .optional({ values: 'falsy' })
+    .trim()
+    .isLength({ min: 3 })
+    .escape(),
+  body('category').optional({ values: 'falsy' }).trim().escape(),
+  body('measure-type', 'Must choose a measurement type')
+    .isLength({ min: 1 })
+    .trim()
+    .escape(),
+  // Process request
+  asyncHandler(async (req, res, next) => {
+    // Extract the validation errors from a request.
+    const errors = validationResult(req);
+
+    // Create a perishable object with escaped and trimmed data.
+    const perishable = new Perishable({
+      title: req.body.title,
+      description: req.body.description,
+      category: req.body.category,
+      measureType: req.body['measure-type'],
+    });
+
+    if (!errors.isEmpty()) {
+      // There are errors. Render the form again with sanitized values/error messages.
+      const allCategories = await Category.find({}).sort({ title: 1 }).exec();
+
+      res.render('perishable_form', {
+        title: 'Create New Perishable Type',
+        category_list: allCategories,
+        perishable: perishable,
+        errors: errors.array(),
+      });
+      return;
+    } else {
+      // Data from form is valid.
+      await perishable.save();
+      // New perishable saved. Redirect to perishable detail page.
+      res.redirect(perishable.url);
+    }
+  }),
+];
 
 // Dispaly Perishable delete form on GET
 exports.perishable_delete_get = asyncHandler(async (req, res, next) => {

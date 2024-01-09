@@ -63,7 +63,7 @@ exports.cookwareinstance_create_post = [
     .trim()
     .isLength({ min: 3 })
     .escape(),
-  body('date-bought').optional({ values: 'falsy' }).trim().escape(),
+  body('date-bought').optional({ values: 'falsy' }).isISO8601().toDate(),
   body('weight').optional({ values: 'falsy' }).trim().escape(),
   body('condition', 'Must choose a condition')
     .isLength({ min: 1 })
@@ -86,8 +86,6 @@ exports.cookwareinstance_create_post = [
     if (!errors.isEmpty()) {
       // There are errors. Render the form again with sanitized values/error messages.
       const allCookware = await Cookware.find({}).sort({ title: 1 }).exec();
-
-      console.log(cookwareInstance.yyyymmdd_dateBought);
 
       res.render('cookwareinstance_form', {
         title: 'Create New Cookware',

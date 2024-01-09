@@ -68,7 +68,6 @@ exports.cookware_create_post = [
       description: req.body.description,
     });
 
-    console.log(errors);
     if (!errors.isEmpty()) {
       // There are errors. Render the form again with sanitized values/error messages.
       res.render('cookware_form', {

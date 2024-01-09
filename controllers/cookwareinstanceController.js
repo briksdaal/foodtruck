@@ -1,5 +1,7 @@
 const CookwareInstance = require('../models/cookwareinstance');
+const Cookware = require('../models/cookware');
 const asyncHandler = require('express-async-handler');
+const { body, validationResult } = require('express-validator');
 
 const sortByTitle = require('../helpers/sortByTitle');
 
@@ -41,13 +43,67 @@ exports.cookwareinstance_detail = asyncHandler(async (req, res, next) => {
 
 // Dispaly Cookware Instance create form on GET
 exports.cookwareinstance_create_get = asyncHandler(async (req, res, next) => {
-  res.send('NOT IMPLEMENTED: Cookware Instance create GET');
+  const allCookware = await Cookware.find({}).sort({ title: 1 }).exec();
+
+  res.render('cookwareinstance_form', {
+    title: 'Create New Cookware',
+    cookware_list: allCookware,
+  });
 });
 
 // Handle Cookware Instance create on POST
-exports.cookwareinstance_create_post = asyncHandler(async (req, res, next) => {
-  res.send('NOT IMPLEMENTED: Cookware Instance create POST');
-});
+exports.cookwareinstance_create_post = [
+  // Validate and sanitize
+  body('cookware', 'Must choose a cookware type')
+    .trim()
+    .isLength({ min: 1 })
+    .escape(),
+  body('description', 'Description must contain at least 3 characters')
+    .optional({ values: 'falsy' })
+    .trim()
+    .isLength({ min: 3 })
+    .escape(),
+  body('date-bought').optional({ values: 'falsy' }).trim().escape(),
+  body('weight').optional({ values: 'falsy' }).trim().escape(),
+  body('condition', 'Must choose a condition')
+    .isLength({ min: 1 })
+    .trim()
+    .escape(),
+  // Process request
+  asyncHandler(async (req, res, next) => {
+    // Extract the validation errors from a request.
+    const errors = validationResult(req);
+
+    // Create a cookware instance object with escaped and trimmed data.
+    const cookwareInstance = new CookwareInstance({
+      cookware: req.body.cookware,
+      description: req.body.description,
+      dateBought: req.body['date-bought'],
+      weight: req.body.weight,
+      condition: req.body.condition,
+    });
+
+    if (!errors.isEmpty()) {
+      // There are errors. Render the form again with sanitized values/error messages.
+      const allCookware = await Cookware.find({}).sort({ title: 1 }).exec();
+
+      console.log(cookwareInstance.yyyymmdd_dateBought);
+
+      res.render('cookwareinstance_form', {
+        title: 'Create New Cookware',
+        cookwareinstance: cookwareInstance,
+        cookware_list: allCookware,
+        errors: errors.array(),
+      });
+      return;
+    } else {
+      // Data from form is valid.
+      await cookwareInstance.save();
+      // New cookware instance saved. Redirect to CookwareInstance detail page.
+      res.redirect(cookwareInstance.url);
+    }
+  }),
+];
 
 // Dispaly Cookware Instance delete form on GET
 exports.cookwareinstance_delete_get = asyncHandler(async (req, res, next) => {

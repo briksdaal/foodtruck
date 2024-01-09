@@ -1,0 +1,50 @@
+<form method="POST">
+  <div class="form-group">
+    <label for="cookware">Cookware:</label>
+    <select id="cookware" name="cookware" class="form-control">
+      <option value="">--Please select a cookware type--</option>
+      <% cookware_list.forEach(l=> { %> <% if (locals.cookwareinstance?.cookware
+      && cookwareinstance.cookware._id.toString() === l._id.toString()) {%>
+      <option value="<%= l._id%>" selected><%= l.title%></option>
+      <% } else {%>
+      <option value="<%= l._id%>"><%= l.title%></option>
+      <% } %> <% }) %>
+    </select>
+  </div>
+  <div class="form-group">
+    <%- include('components/form-group-input', {forName: 'description', label:
+    'Description', placeholder: 'Description', value:
+    locals.cookwareinstance?.description}) %>
+  </div>
+  <div class="form-group">
+    <%- include('components/form-group-date', { forName: 'date-bought', label:
+    'Date Bought', value: locals.cookwareinstance?.yyyymmdd_dateBought}) %>
+  </div>
+  <div class="form-group">
+    <%- include('components/form-group-amount', { forName: 'weight', label:
+    'Weight', value: locals.cookwareinstance?.weight, units: 'grams' }) %>
+  </div>
+  <div class="form-group">
+    <label for="condition">Condition:</label>
+    <select id="condition" name="condition" class="form-control">
+      <option value="">--Please select a condition--</option>
+      <% ['Usable', 'Maintenance', 'No Longer Usable'].forEach(l=> { %> <% if
+      (locals.cookwareinstance && cookwareinstance.condition === l) {%>
+      <option value="<%= l%>" selected><%= l%></option>
+      <% } else {%>
+      <option value="<%= l%>"><%= l%></option>
+      <% } %> <% }) %>
+    </select>
+  </div>
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+<% if (locals.errors) { %>
+<div class="form-errors">
+  <ul>
+    <% errors.forEach(err => { %>
+    <li><%= err.msg %></li>
+    <% }) %>
+  </ul>
+</div>
+<% } %>

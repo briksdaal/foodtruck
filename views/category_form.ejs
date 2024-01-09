@@ -1,7 +1,8 @@
 <form method="POST">
   <div class="form-group">
-    <%- include('components/form-group-input', {item: locals.category, name:
-    'Title', placeholder: 'Fruits, Dairy, Meat, etc'}) %>
+    <%- include('components/form-group-input', {forName: 'title', label:
+    'Title', placeholder: 'Fruits, Dairy, Meat, etc', value:
+    locals.category?.title}) %>
   </div>
   <button type="submit" class="btn btn-primary">Submit</button>
 </form>

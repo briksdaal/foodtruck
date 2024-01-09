@@ -23,11 +23,27 @@ PerishableInstanceSchema.virtual('url').get(function () {
 });
 
 PerishableInstanceSchema.virtual('ddmmyy_dateBought').get(function () {
-  return DateTime.fromJSDate(this.dateBought).toFormat("dd'/'MM'/'yy");
+  return this.dateBought
+    ? DateTime.fromJSDate(this.dateBought).toFormat("dd'/'MM'/'yy")
+    : '';
+});
+
+PerishableInstanceSchema.virtual('yyyymmdd_dateBought').get(function () {
+  return this.dateBought
+    ? DateTime.fromJSDate(this.dateBought).toISODate()
+    : '';
 });
 
 PerishableInstanceSchema.virtual('ddmmyy_dateLastUse').get(function () {
-  return DateTime.fromJSDate(this.dateLastUse).toFormat("dd'/'MM'/'yy");
+  return this.dateLastUse
+    ? DateTime.fromJSDate(this.dateLastUse).toFormat("dd'/'MM'/'yy")
+    : '';
+});
+
+PerishableInstanceSchema.virtual('yyyymmdd_dateLastUse').get(function () {
+  return this.dateLastUse
+    ? DateTime.fromJSDate(this.dateLastUse).toISODate()
+    : '';
 });
 
 PerishableInstanceSchema.virtual('past_date').get(function () {

@@ -20,7 +20,15 @@ CookwareInstanceSchema.virtual('url').get(function () {
 });
 
 CookwareInstanceSchema.virtual('ddmmyy_dateBought').get(function () {
-  return DateTime.fromJSDate(this.dateBought).toFormat("dd'/'MM'/'yyyy");
+  return this.dateBought
+    ? DateTime.fromJSDate(this.dateBought).toFormat("dd'/'MM'/'yyyy")
+    : '';
+});
+
+CookwareInstanceSchema.virtual('yyyymmdd_dateBought').get(function () {
+  return this.dateBought
+    ? DateTime.fromJSDate(this.dateBought).toISODate()
+    : '';
 });
 
 module.exports = mongoose.model('CookwareInstance', CookwareInstanceSchema);

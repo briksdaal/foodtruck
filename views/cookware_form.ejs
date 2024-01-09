@@ -1,11 +1,13 @@
 <form method="POST">
   <div class="form-group">
-    <%- include('components/form-group-input', {item: locals.cookware, name:
-    'Title', placeholder: 'Saucepan, Chef Knife, etc'}) %>
+    <%- include('components/form-group-input', {forName: 'title', label:
+    'Title', placeholder: 'Saucepan, Chef Knife, etc', value:
+    locals.cookware?.title}) %>
   </div>
   <div class="form-group">
-    <%- include('components/form-group-input', {item: locals.cookware, name:
-    'Description', placeholder: 'Description'}) %>
+    <%- include('components/form-group-input', {forName: 'description', label:
+    'Description', placeholder: 'Description', value:
+    locals.cookware?.description}) %>
   </div>
 
   <button type="submit" class="btn btn-primary">Submit</button>

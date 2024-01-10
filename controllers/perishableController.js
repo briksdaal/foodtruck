@@ -84,9 +84,10 @@ exports.perishable_create_post = [
     const perishable = new Perishable({
       title: req.body.title,
       description: req.body.description,
-      category: req.body.category,
       measureType: req.body['measure-type'],
     });
+
+    if (req.body.category) perishable.category = req.body.category;
 
     if (!errors.isEmpty()) {
       // There are errors. Render the form again with sanitized values/error messages.
@@ -101,9 +102,18 @@ exports.perishable_create_post = [
       return;
     } else {
       // Data from form is valid.
-      await perishable.save();
-      // New perishable saved. Redirect to perishable detail page.
-      res.redirect(perishable.url);
+      // Check if perishable with same name already exists.
+      const perishableExists = await Perishable.findOne({
+        title: req.body.title,
+      }).exec();
+      if (perishableExists) {
+        // perishable exists, redirect to its detail page.
+        res.redirect(perishableExists.url);
+      } else {
+        await perishable.save();
+        // New perishable saved. Redirect to perishable detail page.
+        res.redirect(perishable.url);
+      }
     }
   }),
 ];

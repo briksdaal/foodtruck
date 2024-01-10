@@ -2,7 +2,7 @@
 <ul>
   <% cookware.forEach((c) => {%>
   <li>
-    <a href="<%= c.url %>"><%= c.cookware.title %></a> <%= (c.description) ? `-
+    <a href="<%= c.url %>"><%- c.cookware.title %></a> <%- (c.description) ? `-
     ${c.description}` : '' %> <% if (locals.condition) {%>
     <p>
       Condition: <% if (c.condition === 'Usable') { %>

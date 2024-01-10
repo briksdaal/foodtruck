@@ -1,6 +1,6 @@
 <h3>Description</h3>
 <p>
-  <% if (perishable_type.description) { %> <%= perishable_type.description %> <%
+  <% if (perishable_type.description) { %> <%- perishable_type.description %> <%
   } else { %> No Description <% } %>
 </p>
 
@@ -8,7 +8,7 @@
 <p>
   <% if (perishable_type.category) { %>
   <a href="<%= perishable_type.category.url %>"
-    ><%= perishable_type.category.title %></a
+    ><%- perishable_type.category.title %></a
   >
   <% } else { %> No Category Defined <% } %>
 </p>

@@ -1,11 +1,11 @@
 <h3>Perishable Type</h3>
 <p>
   <a href="<%= perishable_instance.perishable.url %>"
-    ><%= perishable_instance.perishable.title %></a
+    ><%- perishable_instance.perishable.title %></a
   >
   <% if (perishable_instance.perishable.category) { %> -
   <a href="<%= perishable_instance.perishable.category.url %>"
-    ><%= perishable_instance.perishable.category.title %></a
+    ><%- perishable_instance.perishable.category.title %></a
   >
   <% } %>
 </p>
@@ -30,7 +30,7 @@
 </p>
 <h3>Purchased At</h3>
 <p>
-  <% if (perishable_instance.placeBought) { %> <%=
+  <% if (perishable_instance.placeBought) { %> <%-
   perishable_instance.placeBought %> <% } else { %> None Listed <% } %>
 </p>
 

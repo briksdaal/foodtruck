@@ -2,7 +2,7 @@
 <ul>
   <% recipes.forEach((r) => { %>
   <li>
-    <a href="<%= r.url %>"><%= r.title %></a>
+    <a href="<%= r.url %>"><%- r.title %></a>
   </li>
   <% }) %>
 </ul>

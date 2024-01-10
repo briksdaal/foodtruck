@@ -1,14 +1,14 @@
 <h3>Cookware Type</h3>
 <p>
   <a href="<%= cookware_instance.cookware.url %>"
-    ><%= cookware_instance.cookware.title %></a
+    ><%- cookware_instance.cookware.title %></a
   >
-  <%= (cookware_instance.cookware.description) ? `-
+  <%- (cookware_instance.cookware.description) ? `-
   ${cookware_instance.cookware.description}` : '' %>
 </p>
 <h3>Description</h3>
 <p>
-  <% if (cookware_instance.description) { %> <%= cookware_instance.description
+  <% if (cookware_instance.description) { %> <%- cookware_instance.description
   %> <% } else { %> No Description <% } %>
 </p>
 <h3>Date Bought</h3>

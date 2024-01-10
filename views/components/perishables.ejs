@@ -2,7 +2,7 @@
 <ul>
   <% perishables.forEach((p) => {%>
   <li>
-    <a href="<%= p.url %>"><%= p.title %></a> <%= (p.description) ? `-
+    <a href="<%= p.url %>"><%- p.title %></a> <%- (p.description) ? `-
     ${p.description}` : '' %>
   </li>
   <% }) %>

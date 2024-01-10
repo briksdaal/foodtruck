@@ -2,7 +2,7 @@
 <ul>
   <% perishables.forEach((p) => { %>
   <li>
-    <a href="<%= p.url %>"><%= p.perishable.title %></a> - <%= date_string %>:
+    <a href="<%= p.url %>"><%- p.perishable.title %></a> - <%- date_string %>:
     <%= p.ddmmyy_dateLastUse %> <% if (locals.showSafeToUse) {%> - <% if
     (p.past_date) { %> <span class="not-usable">Requires Disposal!</span> <% }
     else { %> <span class="usable">Safe to Use</span> <% } %> <% } %>

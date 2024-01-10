@@ -1,6 +1,6 @@
 <h3>Description</h3>
 <p>
-  <% if (recipe.description) { %> <%= recipe.description %> <% } else { %> No
+  <% if (recipe.description) { %> <%- recipe.description %> <% } else { %> No
   Description <% } %>
 </p>
 
@@ -16,7 +16,7 @@
   <ul>
     <% recipe.ingredients.forEach((i) => {%>
     <li>
-      <a href="<%= i.perishable.url %>"><%= i.perishable.title %></a> - <%=
+      <a href="<%= i.perishable.url %>"><%- i.perishable.title %></a> - <%=
       i.amount %> <%- include('components/measure', {measureType:
       i.perishable.measureType}) %>
     </li>

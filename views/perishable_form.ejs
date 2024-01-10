@@ -14,9 +14,9 @@
       <option value="">--Please select a category--</option>
       <% category_list.forEach(c=> { %> <% if (locals.perishable?.category &&
       perishable.category._id.toString() === c._id.toString()) {%>
-      <option value="<%= c._id%>" selected><%= c.title%></option>
+      <option value="<%= c._id%>" selected><%- c.title%></option>
       <% } else {%>
-      <option value="<%= c._id%>"><%= c.title%></option>
+      <option value="<%= c._id%>"><%- c.title%></option>
       <% } %> <% }) %>
     </select>
   </div>

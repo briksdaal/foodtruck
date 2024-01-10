@@ -5,9 +5,9 @@
       <option value="">--Please select a cookware type--</option>
       <% cookware_list.forEach(l=> { %> <% if (locals.cookwareinstance?.cookware
       && cookwareinstance.cookware._id.toString() === l._id.toString()) {%>
-      <option value="<%= l._id%>" selected><%= l.title%></option>
+      <option value="<%= l._id%>" selected><%- l.title%></option>
       <% } else {%>
-      <option value="<%= l._id%>"><%= l.title%></option>
+      <option value="<%= l._id%>"><%- l.title%></option>
       <% } %> <% }) %>
     </select>
   </div>

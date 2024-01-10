@@ -1,0 +1,43 @@
+<form method="POST">
+  <div class="form-group">
+    <label for="perishable">Perishable Type:</label>
+    <select id="perishable" name="perishable" class="form-control">
+      <option value="">--Please select a perishable type--</option>
+      <% perishable_list.forEach(p=> { %> <% if
+      (locals.perishableinstance?.perishable &&
+      perishableinstance.perishable._id.toString() === p._id.toString()) {%>
+      <option value="<%= p._id%>" selected><%- p.title%></option>
+      <% } else {%>
+      <option value="<%= p._id%>"><%- p.title%></option>
+      <% } %> <% }) %>
+    </select>
+  </div>
+  <div class="form-group">
+    <%- include('components/form-group-amount', { forName: 'amount', label:
+    'Amount', value: locals.perishableinstance?.amount, units: false }) %>
+  </div>
+  <div class="form-group">
+    <%- include('components/form-group-date', { forName: 'date-bought', label:
+    'Date Bought', value: locals.perishableinstance?.yyyymmdd_dateBought}) %>
+  </div>
+  <div class="form-group">
+    <%- include('components/form-group-date', { forName: 'date-last-use', label:
+    'Use By', value: locals.perishableinstance?.yyyymmdd_dateLastUse}) %>
+  </div>
+  <div class="form-group">
+    <%- include('components/form-group-input', {forName: 'place-bought', label:
+    'Purchased At', placeholder: 'Rami Levi, Dabbah, etc', value:
+    locals.perishableinstance?.placeBought}) %>
+  </div>
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+<% if (locals.errors) { %>
+<div class="form-errors">
+  <ul>
+    <% errors.forEach(err => { %>
+    <li><%= err.msg %></li>
+    <% }) %>
+  </ul>
+</div>
+<% } %>

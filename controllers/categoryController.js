@@ -114,6 +114,12 @@ exports.category_delete_post = asyncHandler(async (req, res, next) => {
     Perishable.find({ category: req.params.id }).exec(),
   ]);
 
+  if (category === null) {
+    // No results.
+    res.redirect('/categories');
+    return;
+  }
+
   if (allPerishablesInCategory.length > 0) {
     // Category has perishable types using it. Render in the same way as for GET route
     res.render('category_delete', {

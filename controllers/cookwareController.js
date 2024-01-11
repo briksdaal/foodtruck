@@ -129,6 +129,12 @@ exports.cookware_delete_post = asyncHandler(async (req, res, next) => {
       Recipe.find({ cookware: req.params.id }, 'title').exec(),
     ]);
 
+  if (cookware === null) {
+    // No results.
+    res.redirect('/cookware');
+    return;
+  }
+
   if (allInstancesOfCookware.length > 0 || allRecipesWithCookware.length > 0) {
     // Cookware has instances or recipes using it. Render in the same way as for GET route
     res.render('cookware_delete', {

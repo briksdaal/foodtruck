@@ -105,12 +105,38 @@ exports.cookwareinstance_create_post = [
 
 // Dispaly Cookware Instance delete form on GET
 exports.cookwareinstance_delete_get = asyncHandler(async (req, res, next) => {
-  res.send('NOT IMPLEMENTED: Cookware Instance delete GET');
+  // Get details of cookware instance
+  const cookwareinstance = await CookwareInstance.findById(req.params.id)
+    .populate('cookware')
+    .exec();
+
+  if (cookwareinstance === null) {
+    // No results.
+    res.redirect('/cookwareinstances');
+    return;
+  }
+
+  res.render('cookwareinstance_delete', {
+    title: `Delete Cookware - ${cookwareinstance.cookware.title} - ${cookwareinstance._id}`,
+    cookwareinstance: cookwareinstance,
+  });
 });
 
 // Handle Cookware Instance delete on POST
 exports.cookwareinstance_delete_post = asyncHandler(async (req, res, next) => {
-  res.send('NOT IMPLEMENTED: Cookware Instance delete POST');
+  // Get details of cookware instance
+
+  const cookwareinstance = await CookwareInstance.findById(req.params.id)
+    .populate('cookware')
+    .exec();
+
+  if (cookwareinstance === null) {
+    res.redirect('cookwareinstances');
+    return;
+  }
+
+  await CookwareInstance.findByIdAndDelete(req.body.cookwareinstanceid);
+  res.redirect('/cookwareinstances');
 });
 
 // Dispaly Cookware Instance update form on GET

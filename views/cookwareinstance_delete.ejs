@@ -1,0 +1,13 @@
+<h3>
+  Do you really want to delete cookware <%= cookwareinstance._id %> of type '<%-
+  cookwareinstance.cookware.title %>'?
+</h3>
+<form method="POST">
+  <input
+    type="hidden"
+    id="cookwareinstanceid"
+    name="cookwareinstanceid"
+    value="<%= cookwareinstance._id %>"
+  />
+  <button type="submit" class="btn btn-primary">Delete</button>
+</form>

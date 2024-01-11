@@ -101,8 +101,8 @@ exports.cookware_delete_get = asyncHandler(async (req, res, next) => {
   const [cookware, allInstancesOfCookware, allRecipesWithCookware] =
     await Promise.all([
       Cookware.findById(req.params.id).exec(),
-      CookwareInstance.find({ cookware: req.params.id }).exec(),
-      Recipe.find({ cookware: req.params.id }).exec(),
+      CookwareInstance.find({ cookware: req.params.id }, 'title').exec(),
+      Recipe.find({ cookware: req.params.id }, 'title').exec(),
     ]);
 
   if (cookware === null) {

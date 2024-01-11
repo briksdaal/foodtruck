@@ -90,7 +90,7 @@ exports.category_delete_get = asyncHandler(async (req, res, next) => {
   // Get details of category and all perishable types using it
   const [category, allPerishablesInCategory] = await Promise.all([
     Category.findById(req.params.id).exec(),
-    Perishable.find({ category: req.params.id }).exec(),
+    Perishable.find({ category: req.params.id }, 'title').exec(),
   ]);
 
   if (category === null) {
@@ -111,7 +111,7 @@ exports.category_delete_post = asyncHandler(async (req, res, next) => {
   // Get details of category and all perishable types using it
   const [category, allPerishablesInCategory] = await Promise.all([
     Category.findById(req.params.id).exec(),
-    Perishable.find({ category: req.params.id }).exec(),
+    Perishable.find({ category: req.params.id }, 'title').exec(),
   ]);
 
   if (category === null) {

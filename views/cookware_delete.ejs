@@ -1,0 +1,37 @@
+<% if (cookwareinstance_list.length > 0 || recipe_list.length > 0) { %> <% if
+(cookwareinstance_list.length > 0) {%>
+<h3>
+  Remove the following cookware of type '<%- cookware.title %>' before
+  attempting to delete this cookware type:
+</h3>
+<ul>
+  <% cookwareinstance_list.forEach(c => { %>
+  <li>
+    <a href="<%= c.url %>"><%- cookware.title %></a>
+  </li>
+  <% }) %>
+</ul>
+<% } %> <% if (recipe_list.length > 0) {%>
+<h3>
+  Replace or remove '<%- cookware.title %>' in the following recipes before
+  attempting to delete this cookware type:
+</h3>
+<ul>
+  <% recipe_list.forEach(r => { %>
+  <li>
+    <a href="<%= r.url %>"><%- r.title %></a>
+  </li>
+  <% }) %>
+</ul>
+<% } %> <% } else { %>
+<h3>Do you really want to delete the '<%- cookware.title %>' cookware type?</h3>
+<form method="POST">
+  <input
+    type="hidden"
+    id="cookwareid"
+    name="cookwareid"
+    value="<%= cookware._id %>"
+  />
+  <button type="submit" class="btn btn-primary">Delete</button>
+</form>
+<% } %>

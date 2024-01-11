@@ -1,0 +1,10 @@
+<h3>Do you really want to delete recipe '<%- recipe.title %>'?</h3>
+<form method="POST">
+  <input
+    type="hidden"
+    id="recipeid"
+    name="recipeid"
+    value="<%= recipe._id %>"
+  />
+  <button type="submit" class="btn btn-primary">Delete</button>
+</form>

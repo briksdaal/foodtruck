@@ -16,7 +16,7 @@
         <label>
           <select name="cookware[]" class="form-control">
             <option value="">--Please select a cookware type--</option>
-            <% cookware_list.forEach(c=> { %> <% if (usedC._id.toString() ===
+            <% cookware_list.forEach(c=> { %> <% if (usedC?._id.toString() ===
             c._id.toString()) {%>
             <option value="<%= c._id%>" selected><%- c.title%></option>
             <% } else {%>
@@ -85,7 +85,7 @@
       class="form-control"
       style="height: 200px"
     >
-<%- locals.recipe?.instructions ? recipe.instructions.replaceAll('<br/>', '\n') : '' %></textarea
+<%- locals.recipe?.instructions ? recipe.instructions.replaceAll('<br/>', '\r\n') : '' %></textarea
     >
   </div>
   <button type="submit" class="btn btn-primary">Submit</button>

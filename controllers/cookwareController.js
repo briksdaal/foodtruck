@@ -153,10 +153,65 @@ exports.cookware_delete_post = asyncHandler(async (req, res, next) => {
 
 // Dispaly Cookware update form on GET
 exports.cookware_update_get = asyncHandler(async (req, res, next) => {
-  res.send('NOT IMPLEMENTED: Cookware update GET');
+  const cookware = await Cookware.findById(req.params.id);
+
+  if (cookware === null) {
+    // No results.
+    const err = new Error('Cookware type not found');
+    err.status = 404;
+    return next(err);
+  }
+
+  res.render('cookware_form', {
+    title: `Update Cookware Type - ${cookware.title}`,
+    cookware: cookware,
+  });
 });
 
 // Handle Cookware update on POST
-exports.cookware_update_post = asyncHandler(async (req, res, next) => {
-  res.send('NOT IMPLEMENTED: Cookware update POST');
-});
+exports.cookware_update_post = [
+  // Validate and sanitize
+  body('title', 'Cookware type title must contain at least 3 characters')
+    .trim()
+    .isLength({ min: 3 })
+    .escape(),
+  body('description', 'Description must contain at least 3 characters')
+    .optional({ values: 'falsy' })
+    .trim()
+    .isLength({ min: 3 })
+    .escape(),
+  // Process request
+  asyncHandler(async (req, res, next) => {
+    // Extract the validation errors from a request.
+    const errors = validationResult(req);
+
+    // Create a cookware object with escaped and trimmed data, and old id.
+    const cookware = new Cookware({
+      title: req.body.title,
+      description: req.body.description,
+      _id: req.params.id,
+    });
+
+    if (!errors.isEmpty()) {
+      // There are errors. Render the form again with sanitized values/error messages.
+
+      // Get current cookware object
+      const currentCookware = await Cookware.findById(req.params.id);
+
+      res.render('cookware_form', {
+        title: `Update Cookware Type - ${currentCookware.title}`,
+        cookware: cookware,
+        errors: errors.array(),
+      });
+      return;
+    } else {
+      // Data from form is valid. Update the record
+      const updatedCookware = await Cookware.findByIdAndUpdate(
+        req.params.id,
+        cookware
+      );
+      // Cookware updated. Redirect to Cookware detail page.
+      res.redirect(updatedCookware.url);
+    }
+  }),
+];

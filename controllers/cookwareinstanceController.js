@@ -141,10 +141,82 @@ exports.cookwareinstance_delete_post = asyncHandler(async (req, res, next) => {
 
 // Dispaly Cookware Instance update form on GET
 exports.cookwareinstance_update_get = asyncHandler(async (req, res, next) => {
-  res.send('NOT IMPLEMENTED: Cookware Instance update GET');
+  const [cookwareinstance, allCookware] = await Promise.all([
+    CookwareInstance.findById(req.params.id).populate('cookware').exec(),
+    Cookware.find({}).sort({ title: 1 }).exec(),
+  ]);
+
+  if (cookwareinstance === null) {
+    // No results.
+    const err = new Error('Cookware not found');
+    err.status = 404;
+    return next(err);
+  }
+
+  res.render('cookwareinstance_form', {
+    title: `Update Cookware - ${cookwareinstance.cookware.title} - ${cookwareinstance._id}`,
+    cookwareinstance: cookwareinstance,
+    cookware_list: allCookware,
+  });
 });
 
 // Handle Cookware Instance update on POST
-exports.cookwareinstance_update_post = asyncHandler(async (req, res, next) => {
-  res.send('NOT IMPLEMENTED: Cookware Instance update POST');
-});
+exports.cookwareinstance_update_post = [
+  // Validate and sanitize
+  body('cookware', 'Must choose a cookware type')
+    .trim()
+    .isLength({ min: 1 })
+    .escape(),
+  body('description', 'Description must contain at least 3 characters')
+    .optional({ values: 'falsy' })
+    .trim()
+    .isLength({ min: 3 })
+    .escape(),
+  body('date-bought').optional({ values: 'falsy' }).isISO8601().toDate(),
+  body('weight').optional({ values: 'falsy' }).trim().escape(),
+  body('condition', 'Must choose a condition')
+    .isLength({ min: 1 })
+    .trim()
+    .escape(),
+  // Process request
+  asyncHandler(async (req, res, next) => {
+    // Extract the validation errors from a request.
+    const errors = validationResult(req);
+
+    // Create a cookware instance object with escaped and trimmed data, and old id.
+    const cookwareInstance = new CookwareInstance({
+      cookware: req.body.cookware,
+      description: req.body.description,
+      dateBought: req.body['date-bought'],
+      weight: req.body.weight,
+      condition: req.body.condition,
+      _id: req.params.id,
+    });
+
+    if (!errors.isEmpty()) {
+      // There are errors. Render the form again with sanitized values/error messages.
+
+      // Get currrent cookware instance and cookware list for rerender
+      const [currentCookwareinstance, allCookware] = await Promise.all([
+        CookwareInstance.findById(req.params.id).populate('cookware').exec(),
+        Cookware.find({}).sort({ title: 1 }).exec(),
+      ]);
+
+      res.render('cookwareinstance_form', {
+        title: `Update Cookware - ${currentCookwareinstance.cookware.title} - ${currentCookwareinstance._id}`,
+        cookwareinstance: cookwareInstance,
+        cookware_list: allCookware,
+        errors: errors.array(),
+      });
+      return;
+    } else {
+      // Data from form is valid. Update the record
+      const updatedCookwareInstance = await CookwareInstance.findByIdAndUpdate(
+        req.params.id,
+        cookwareInstance
+      );
+      // Cookware updated. Redirect to Cookware detail page.
+      res.redirect(updatedCookwareInstance.url);
+    }
+  }),
+];

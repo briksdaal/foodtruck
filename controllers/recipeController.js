@@ -2,7 +2,8 @@ const Recipe = require('../models/recipe');
 const Cookware = require('../models/cookware');
 const Perishable = require('../models/perishable');
 const asyncHandler = require('express-async-handler');
-const { body, validationResult } = require('express-validator');
+const { validationResult } = require('express-validator');
+const { recipePreprocess } = require('./recipePreprocess');
 
 // Display list of all Recipes
 exports.recipe_list = asyncHandler(async (req, res, next) => {
@@ -50,66 +51,8 @@ exports.recipe_create_get = asyncHandler(async (req, res, next) => {
 
 // Handle recipe create on POST
 exports.recipe_create_post = [
-  // Convert cookware and ingredients to arrays.
-  (req, res, next) => {
-    if (!Array.isArray(req.body['cookware[]'])) {
-      req.body['cookware[]'] =
-        typeof req.body['cookware[]'] === 'undefined'
-          ? []
-          : [req.body['cookware[]']];
-    }
-    if (!Array.isArray(req.body['ingredients[][perishable]'])) {
-      req.body['ingredients[][perishable]'] =
-        typeof req.body['ingredients[][perishable]'] === 'undefined'
-          ? []
-          : [req.body['ingredients[][perishable]']];
-    }
-    if (!Array.isArray(req.body['ingredients[][amount]'])) {
-      req.body['ingredients[][amount]'] =
-        typeof req.body['ingredients[][amount]'] === 'undefined'
-          ? []
-          : [req.body['ingredients[][amount]']];
-    }
-
-    // Rename fields for ease of use and because express validator doesn't recognize [] characters
-    req.body.cookware = req.body['cookware[]'];
-    delete req.body['cookware[]'];
-    req.body.ingredientperishables = req.body['ingredients[][perishable]'];
-    delete req.body['ingredients[][perishable]'];
-    req.body.ingredientamounts = req.body['ingredients[][amount]'];
-    delete req.body['ingredients[][amount]'];
-    next();
-  },
-  // Validate and sanitize fields.
-  body('title', 'Title must not be empty.')
-    .trim()
-    .isLength({ min: 1 })
-    .escape(),
-  body('description', 'Description must contain at least 3 characters')
-    .optional({ values: 'falsy' })
-    .trim()
-    .isLength({ min: 3 })
-    .escape(),
-  body('cookware', 'Cookware error').isArray({ min: 0 }),
-  body('cookware.*', 'Cookware element error')
-    .trim()
-    .isLength({ min: 1 })
-    .escape(),
-  body('ingredientperishables', 'Must contain at least one ingredient').isArray(
-    { min: 1 }
-  ),
-  body('ingredientperishables.*', 'Perishable must be selected or removed')
-    .trim()
-    .isLength({ min: 1 })
-    .escape(),
-  body('ingredientamounts.*', 'Amount must not be empty or 0')
-    .trim()
-    .isLength({ min: 1 })
-    .escape(),
-  body('instructions', 'Instructions must contain at least 5 chracters')
-    .trim()
-    .isLength({ min: 5 })
-    .escape(),
+  // Convert relevant fields to arrays, rename fields, validate and sanitize
+  recipePreprocess,
   // Process request after validation and sanitization.
   asyncHandler(async (req, res, next) => {
     // Extract the validation errors from a request.
@@ -120,11 +63,13 @@ exports.recipe_create_post = [
       amount: +req.body.ingredientamounts[i],
     }));
 
+    const cookware = req.body.cookware.map((c) => (c ? c : null));
+
     // Create a Recipe object with escaped and trimmed data.
     const recipe = new Recipe({
       title: req.body.title,
       description: req.body.description,
-      cookware: req.body.cookware,
+      cookware: cookware,
       ingredients: ingredients,
       instructions: req.body.instructions,
     });
@@ -196,10 +141,82 @@ exports.recipe_delete_post = asyncHandler(async (req, res, next) => {
 
 // Dispaly recipe update form on GET
 exports.recipe_update_get = asyncHandler(async (req, res, next) => {
-  res.send('NOT IMPLEMENTED: Recipe update GET');
+  const [recipe, allPerishables, allCookware] = await Promise.all([
+    Recipe.findById(req.params.id).exec(),
+    Perishable.find({}).sort({ title: 1 }).exec(),
+    Cookware.find({}).sort({ title: 1 }).exec(),
+  ]);
+
+  if (recipe === null) {
+    // No results.
+    const err = new Error('Recipe not found');
+    err.status = 404;
+    return next(err);
+  }
+
+  res.render('recipe_form', {
+    title: `Update Recipe - ${recipe.title}`,
+    recipe: recipe,
+    perishable_list: allPerishables,
+    cookware_list: allCookware,
+  });
 });
 
 // Handle recipe update on POST
-exports.recipe_update_post = asyncHandler(async (req, res, next) => {
-  res.send('NOT IMPLEMENTED: Recipe update POST');
-});
+exports.recipe_update_post = [
+  // Convert relevant fields to arrays, rename fields, validate and sanitize
+  recipePreprocess,
+  // Process request after validation and sanitization.
+  asyncHandler(async (req, res, next) => {
+    // Extract the validation errors from a request.
+    const errors = validationResult(req);
+
+    const ingredients = req.body.ingredientperishables.map((p, i) => ({
+      perishable: p,
+      amount: +req.body.ingredientamounts[i],
+    }));
+
+    const cookware = req.body.cookware.map((c) => (c ? c : null));
+
+    const instructions = req.body.instructions.replaceAll('\r\n', '<br/>');
+
+    // Create a Recipe object with escaped and trimmed data, and old id.
+    const recipe = new Recipe({
+      title: req.body.title,
+      description: req.body.description,
+      cookware: cookware,
+      ingredients: ingredients,
+      instructions: instructions,
+      _id: req.params.id,
+    });
+
+    if (!errors.isEmpty()) {
+      // There are errors. Render form again with sanitized values/error messages.
+
+      // Get currrent recipe and cookware and perishable lists for rerender
+      const [currentRecipe, allPerishables, allCookware] = await Promise.all([
+        Recipe.findById(req.params.id).exec(),
+        Perishable.find({}).sort({ title: 1 }).exec(),
+        Cookware.find({}).sort({ title: 1 }).exec(),
+      ]);
+
+      res.render('recipe_form', {
+        title: `Update Recipe - ${currentRecipe.title}`,
+        recipe: recipe,
+        perishable_list: allPerishables,
+        cookware_list: allCookware,
+        errors: errors.array(),
+      });
+      return;
+    } else {
+      console.log(recipe);
+      // Data from form is valid. Update the record
+      const updatedRecipe = await Recipe.findByIdAndUpdate(
+        req.params.id,
+        recipe
+      );
+      // Recipe updated. Redirect to recipe detail page.
+      res.redirect(updatedRecipe.url);
+    }
+  }),
+];

@@ -144,12 +144,82 @@ exports.perishableinstance_delete_post = asyncHandler(
 
 // Dispaly Perishable Instance update form on GET
 exports.perishableinstance_update_get = asyncHandler(async (req, res, next) => {
-  res.send('NOT IMPLEMENTED: Perishable Instance update GET');
+  const [perishableinstance, allPerishables] = await Promise.all([
+    PerishableInstance.findById(req.params.id).populate('perishable').exec(),
+    Perishable.find({}).sort({ title: 1 }).exec(),
+  ]);
+
+  if (perishableinstance === null) {
+    // No results.
+    const err = new Error('Perishable not found');
+    err.status = 404;
+    return next(err);
+  }
+
+  res.render('perishableinstance_form', {
+    title: `Update perishable - ${perishableinstance.perishable.title} - ${perishableinstance._id}`,
+    perishableinstance: perishableinstance,
+    perishable_list: allPerishables,
+  });
 });
 
 // Handle Perishable Instance update on POST
-exports.perishableinstance_update_post = asyncHandler(
-  async (req, res, next) => {
-    res.send('NOT IMPLEMENTED: Perishable Instance update POST');
-  }
-);
+exports.perishableinstance_update_post = [
+  // Validate and sanitize
+  body('perishable', 'Must choose a perishable type')
+    .trim()
+    .isLength({ min: 1 })
+    .escape(),
+  body('amount', 'Must specify an amount').trim().isLength({ min: 1 }).escape(),
+  body('place-bought', 'Place must contain at least 3 characters')
+    .optional({ values: 'falsy' })
+    .trim()
+    .isLength({ min: 3 })
+    .escape(),
+  body('date-bought').optional({ values: 'falsy' }).isISO8601().toDate(),
+  body('date-last-use').optional({ values: 'falsy' }).isISO8601().toDate(),
+  // Process request
+  asyncHandler(async (req, res, next) => {
+    // Extract the validation errors from a request.
+    const errors = validationResult(req);
+
+    // Create a perishable instance object with escaped and trimmed data, and old id.
+    const perishableInstance = new PerishableInstance({
+      perishable: req.body.perishable,
+      amount: req.body.amount,
+      placeBought: req.body['place-bought'],
+      dateBought: req.body['date-bought'],
+      dateLastUse: req.body['date-last-use'],
+      _id: req.params.id,
+    });
+
+    if (!errors.isEmpty()) {
+      // There are errors. Render the form again with sanitized values/error messages.
+
+      // Get currrent perishable instance and perishable list for rerender
+      const [currentPerishableinstance, allPerishables] = await Promise.all([
+        PerishableInstance.findById(req.params.id)
+          .populate('perishable')
+          .exec(),
+        Perishable.find({}).sort({ title: 1 }).exec(),
+      ]);
+
+      res.render('perishableinstance_form', {
+        title: `Update Perishable - ${currentPerishableinstance.perishable.title} - ${currentPerishableinstance._id}`,
+        perishableinstance: perishableInstance,
+        perishable_list: allPerishables,
+        errors: errors.array(),
+      });
+      return;
+    } else {
+      // Data from form is valid. Update the record
+      const updatedPerishableInstance =
+        await PerishableInstance.findByIdAndUpdate(
+          req.params.id,
+          perishableInstance
+        );
+      // Perishable updated. Redirect to perishable detail page.
+      res.redirect(updatedPerishableInstance.url);
+    }
+  }),
+];

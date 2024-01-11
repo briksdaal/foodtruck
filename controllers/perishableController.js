@@ -180,10 +180,73 @@ exports.perishable_delete_post = asyncHandler(async (req, res, next) => {
 
 // Dispaly Perishable update form on GET
 exports.perishable_update_get = asyncHandler(async (req, res, next) => {
-  res.send('NOT IMPLEMENTED: Perishable update GET');
+  const [perishable, allCategories] = await Promise.all([
+    Perishable.findById(req.params.id).exec(),
+    Category.find({}).sort({ title: 1 }).exec(),
+  ]);
+
+  res.render('perishable_form', {
+    title: `Update Perishable Type - ${perishable.title}`,
+    perishable: perishable,
+    category_list: allCategories,
+  });
 });
 
 // Handle Perishable update on POST
-exports.perishable_update_post = asyncHandler(async (req, res, next) => {
-  res.send('NOT IMPLEMENTED: Perishable update POST');
-});
+exports.perishable_update_post = [
+  // Validate and sanitize
+  body('title', 'Title must contain at least 3 characters')
+    .trim()
+    .isLength({ min: 3 })
+    .escape(),
+  body('description', 'Description must contain at least 3 characters')
+    .optional({ values: 'falsy' })
+    .trim()
+    .isLength({ min: 3 })
+    .escape(),
+  body('category').optional({ values: 'falsy' }).trim().escape(),
+  body('measure-type', 'Must choose a measurement type')
+    .isLength({ min: 1 })
+    .trim()
+    .escape(),
+  // Process request
+  asyncHandler(async (req, res, next) => {
+    // Extract the validation errors from a request.
+    const errors = validationResult(req);
+
+    // Create a perishable object with escaped and trimmed data, and old id.
+    const perishable = new Perishable({
+      title: req.body.title,
+      description: req.body.description,
+      measureType: req.body['measure-type'],
+      category: req.body.category || null,
+      _id: req.params.id,
+    });
+
+    if (!errors.isEmpty()) {
+      // There are errors. Render the form again with sanitized values/error messages.
+
+      // Get currrent perishable and category list for rerender
+      const [currentPerishable, allCategories] = await Promise.all([
+        Perishable.findById(req.params.id).exec(),
+        Category.find({}).sort({ title: 1 }).exec(),
+      ]);
+
+      res.render('perishable_form', {
+        title: `Update Perishable Type - ${currentPerishable.title}`,
+        perishable: perishable,
+        category_list: allCategories,
+        errors: errors.array(),
+      });
+      return;
+    } else {
+      // Data from form is valid. Update the record
+      const updatedPerishable = await Perishable.findByIdAndUpdate(
+        req.params.id,
+        perishable
+      );
+      // Perishable updated. Redirect to Perishable detail page.
+      res.redirect(updatedPerishable.url);
+    }
+  }),
+];

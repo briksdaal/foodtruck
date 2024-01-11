@@ -107,13 +107,38 @@ exports.perishableinstance_create_post = [
 
 // Dispaly Perishable Instance delete form on GET
 exports.perishableinstance_delete_get = asyncHandler(async (req, res, next) => {
-  res.send('NOT IMPLEMENTED: Perishable Instance delete GET');
+  // Get details of perishable instance
+  const perishableinstance = await PerishableInstance.findById(req.params.id)
+    .populate('perishable')
+    .exec();
+
+  if (perishableinstance === null) {
+    // No results.
+    res.redirect('/perishableinstances');
+    return;
+  }
+
+  res.render('perishableinstance_delete', {
+    title: `Delete Perishable - ${perishableinstance.perishable.title} - ${perishableinstance._id}`,
+    perishableinstance: perishableinstance,
+  });
 });
 
 // Handle Perishable Instance delete on POST
 exports.perishableinstance_delete_post = asyncHandler(
   async (req, res, next) => {
-    res.send('NOT IMPLEMENTED: Perishable Instance delete POST');
+    // Get details of perishable instance
+    const perishableinstance = await PerishableInstance.findById(req.params.id)
+      .populate('perishable')
+      .exec();
+
+    if (perishableinstance === null) {
+      res.redirect('perishableinstances');
+      return;
+    }
+
+    await PerishableInstance.findByIdAndDelete(req.body.perishableinstanceid);
+    res.redirect('/perishableinstances');
   }
 );
 

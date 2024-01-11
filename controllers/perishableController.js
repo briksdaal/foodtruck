@@ -129,8 +129,6 @@ exports.perishable_delete_get = asyncHandler(async (req, res, next) => {
       Recipe.find({ 'ingredients.perishable': req.params.id }, 'title').exec(),
     ]);
 
-  console.log(allRecipesWithPerishable);
-
   if (perishable === null) {
     // No results.
     res.redirect('/perishables');

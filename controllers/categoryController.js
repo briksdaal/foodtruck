@@ -87,12 +87,46 @@ exports.category_create_post = [
 
 // Dispaly Category delete form on GET
 exports.category_delete_get = asyncHandler(async (req, res, next) => {
-  res.send('NOT IMPLEMENTED: Category delete GET');
+  // Get details of category and all perishable types using it
+  const [category, allPerishablesInCategory] = await Promise.all([
+    Category.findById(req.params.id).exec(),
+    Perishable.find({ category: req.params.id }).exec(),
+  ]);
+
+  if (category === null) {
+    // No results.
+    res.redirect('/categories');
+    return;
+  }
+
+  res.render('category_delete', {
+    title: `Delete Category - ${category.title}`,
+    category: category,
+    perishable_list: allPerishablesInCategory,
+  });
 });
 
 // Handle Category delete on POST
 exports.category_delete_post = asyncHandler(async (req, res, next) => {
-  res.send('NOT IMPLEMENTED: Category delete POST');
+  // Get details of category and all perishable types using it
+  const [category, allPerishablesInCategory] = await Promise.all([
+    Category.findById(req.params.id).exec(),
+    Perishable.find({ category: req.params.id }).exec(),
+  ]);
+
+  if (allPerishablesInCategory.length > 0) {
+    // Category has perishable types using it. Render in the same way as for GET route
+    res.render('category_delete', {
+      title: `Delete Category - ${category.title}`,
+      category: category,
+      perishable_list: allPerishablesInCategory,
+    });
+    return;
+  } else {
+    // Category has no perishable types using it. Delete object and redirect to category list
+    await Category.findByIdAndDelete(req.body.categoryid);
+    res.redirect('/categories');
+  }
 });
 
 // Dispaly Category update form on GET

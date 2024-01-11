@@ -89,8 +89,6 @@ exports.perishableinstance_create_post = [
         .sort({ title: 1 })
         .exec();
 
-      console.log(perishableInstance);
-
       res.render('perishableinstance_form', {
         title: 'Create New Perishable',
         perishable_list: allPerishables,

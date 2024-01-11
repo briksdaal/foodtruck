@@ -12,7 +12,8 @@
 <h3>Amount</h3>
 <p>
   <%= perishable_instance.amount %> <%- include('components/measure',
-  {measureType: perishable_instance.perishable.measureType}) %>
+  {measureType: perishable_instance.perishable.measureType, amount:
+  perishable_instance.amount}) %>
 </p>
 <h3>Date Bought</h3>
 <p>

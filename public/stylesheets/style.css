@@ -28,6 +28,10 @@ h3 {
   margin-bottom: 0.5rem;
 }
 
+textarea {
+  font: 18px 'Lucida Grande', Helvetica, Arial, sans-serif;
+}
+
 .full-width {
   width: 100%;
 }
@@ -162,7 +166,81 @@ h3 {
   border-color: #0062cc;
 }
 
+.btn-secondary {
+  color: #fff;
+  background-color: #6c757d;
+  border-color: #6c757d;
+}
+
+.btn-secondary:hover {
+  color: #fff;
+  background-color: #5a6268;
+  border-color: #545b62;
+}
+
+.btn-limited {
+  max-width: 200px;
+}
+
 .form-errors {
   color: #c03232;
   margin-top: 1rem;
+}
+
+fieldset {
+  border: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.cookware-row {
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.cookware-row label {
+  width: 100%;
+}
+
+.ingredient-row {
+  display: flex;
+  margin-top: 1rem;
+  width: 100%;
+  gap: 2rem;
+}
+
+.ingredient-row > .row-element:first-child {
+  width: 100%;
+}
+
+.row-element {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.row-element label {
+  font-size: 0.8rem;
+}
+
+.remove-cookware-btn,
+.remove-ingredient-btn {
+  font-size: 1rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.remove-cookware-btn:hover,
+.remove-ingredient-btn:hover {
+  color: #9f9f9f;
+}
+
+.remove-ingredient-btn {
+  display: flex;
+  align-items: self-end;
+  padding-bottom: 0.5rem;
+  height: 100%;
 }

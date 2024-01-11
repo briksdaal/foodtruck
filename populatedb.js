@@ -437,7 +437,7 @@ async function createRecipes() {
       0,
       'Salad',
       'Can always be made.',
-      'Cut Up Vegetables.\nPlate Nicely.',
+      'Cut Up Vegetables.<br/>Plate Nicely.',
       cookwares[1],
       [
         { perishable: perishables[0], amount: 100 },
@@ -448,8 +448,8 @@ async function createRecipes() {
       0,
       'Hamburger',
       false,
-      'Mince beef and make patty\n.Fry patty.\nToast bun.\nAssemble with lettuce and tomatoes on top.',
-      cookwares[0],
+      'Mince beef and make patty.<br/>Fry patty.<br/>Toast bun.<br/>Assemble with lettuce and tomatoes on top.',
+      [cookwares[0], cookwares[1], cookwares[2]],
       [
         { perishable: perishables[2], amount: 250 },
         { perishable: perishables[14], amount: 1 },

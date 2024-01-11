@@ -1,5 +1,6 @@
 const Perishable = require('../models/perishable');
 const PerishableInstance = require('../models/perishableinstance');
+const Recipe = require('../models/recipe');
 const Category = require('../models/category');
 const asyncHandler = require('express-async-handler');
 const { body, validationResult } = require('express-validator');
@@ -120,12 +121,63 @@ exports.perishable_create_post = [
 
 // Dispaly Perishable delete form on GET
 exports.perishable_delete_get = asyncHandler(async (req, res, next) => {
-  res.send('NOT IMPLEMENTED: Perishable delete GET');
+  // Get details of perishable and all perishable instances and recipes using it
+  const [perishable, allInstancesOfPerishable, allRecipesWithPerishable] =
+    await Promise.all([
+      Perishable.findById(req.params.id).exec(),
+      PerishableInstance.find({ perishable: req.params.id }, 'title').exec(),
+      Recipe.find({ 'ingredients.perishable': req.params.id }, 'title').exec(),
+    ]);
+
+  console.log(allRecipesWithPerishable);
+
+  if (perishable === null) {
+    // No results.
+    res.redirect('/perishables');
+    return;
+  }
+
+  res.render('perishable_delete', {
+    title: `Delete Perishable Type - ${perishable.title}`,
+    perishable: perishable,
+    perishableinstance_list: allInstancesOfPerishable,
+    recipe_list: allRecipesWithPerishable,
+  });
 });
 
 // Handle Perishable delete on POST
 exports.perishable_delete_post = asyncHandler(async (req, res, next) => {
-  res.send('NOT IMPLEMENTED: Perishable delete POST');
+  // Get details of perishable and all perishable instances and recipes using it
+  const [perishable, allInstancesOfPerishable, allRecipesWithPerishable] =
+    await Promise.all([
+      Perishable.findById(req.params.id).exec(),
+      PerishableInstance.find({ perishable: req.params.id }, 'title').exec(),
+      Recipe.find({ 'ingredients.perishable': req.params.id }, 'title').exec(),
+    ]);
+
+  if (perishable === null) {
+    // No results.
+    res.redirect('/perishables');
+    return;
+  }
+
+  if (
+    allInstancesOfPerishable.length > 0 ||
+    allRecipesWithPerishable.length > 0
+  ) {
+    // Perishable has instances or recipes using it. Render in the same way as for GET route
+    res.render('perishable_delete', {
+      title: `Delete Perishable Type - ${perishable.title}`,
+      perishable: perishable,
+      perishableinstance_list: allInstancesOfPerishable,
+      recipe_list: allRecipesWithPerishable,
+    });
+    return;
+  } else {
+    // Perishable has no instances or recipes using it. Delete object and redirect to perishable list
+    await Perishable.findByIdAndDelete(req.body.perishableid);
+    res.redirect('/perishables');
+  }
 });
 
 // Dispaly Perishable update form on GET

@@ -1,0 +1,39 @@
+<% if (perishableinstance_list.length > 0 || recipe_list.length > 0) { %> <% if
+(perishableinstance_list.length > 0) {%>
+<h3>
+  Remove the following perishables of type '<%- perishable.title %>' before
+  attempting to delete this perishable type:
+</h3>
+<ul>
+  <% perishableinstance_list.forEach(p => { %>
+  <li>
+    <a href="<%= p.url %>"><%- perishable.title %></a>
+  </li>
+  <% }) %>
+</ul>
+<% } %> <% if (recipe_list.length > 0) {%>
+<h3>
+  Replace or remove '<%- perishable.title %>' in the following recipes before
+  attempting to delete this perishable type:
+</h3>
+<ul>
+  <% recipe_list.forEach(r => { %>
+  <li>
+    <a href="<%= r.url %>"><%- r.title %></a>
+  </li>
+  <% }) %>
+</ul>
+<% } %> <% } else { %>
+<h3>
+  Do you really want to delete the '<%- perishable.title %>' perishable type?
+</h3>
+<form method="POST">
+  <input
+    type="hidden"
+    id="perishableid"
+    name="perishableid"
+    value="<%= perishable._id %>"
+  />
+  <button type="submit" class="btn btn-primary">Delete</button>
+</form>
+<% } %>

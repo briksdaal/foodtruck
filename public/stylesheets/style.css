@@ -244,3 +244,12 @@ fieldset {
   padding-bottom: 0.5rem;
   height: 100%;
 }
+
+.image-container {
+  display: flex;
+  max-height: 300px;
+}
+
+.image-container img {
+  object-fit: contain;
+}

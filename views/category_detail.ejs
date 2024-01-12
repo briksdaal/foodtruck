@@ -1,3 +1,9 @@
+<% if (category.image) { %>
+<div class="image-container">
+  <img src="<%= category.imagepath %>" alt="<%- category.title %>" />
+</div>
+<% } %>
+
 <h3>Perishable Types In Category</h3>
 <%- include('components/perishables', {perishables: category_perishables}) %>
 

@@ -1,7 +1,13 @@
+const fs = require('fs').promises;
+const FileType = require('file-type');
+var createError = require('http-errors');
 const Category = require('../models/category');
 const Perishable = require('../models/perishable');
 const asyncHandler = require('express-async-handler');
 const { body, validationResult } = require('express-validator');
+const multer = require('multer');
+
+const upload = multer({ dest: 'public/uploads' });
 
 // Display list of all Categories
 exports.category_list = asyncHandler(async (req, res, next) => {
@@ -46,6 +52,22 @@ exports.category_create_get = (req, res, next) => {
 
 // Handle Category create on POST
 exports.category_create_post = [
+  // Upload image
+  upload.single('image'),
+  // Validate image
+  async (req, res, next) => {
+    if (req.file) {
+      const whitelist = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+      const meta = await FileType.fromFile(req.file.path);
+
+      if (!meta || !whitelist.includes(meta.mime)) {
+        fs.unlink(`public/uploads/${req.file.filename}`);
+        return next(new Error('Unaccepted file type'));
+      }
+    }
+
+    next();
+  },
   // Validate and sanitize
   body('title', 'Category title must contain at least 3 characters')
     .trim()
@@ -55,12 +77,20 @@ exports.category_create_post = [
   asyncHandler(async (req, res, next) => {
     // Extract the validation errors from a request.
     const errors = validationResult(req);
-
     // Create a category object with escaped and trimmed data.
-    const category = new Category({ title: req.body.title });
+    const category = new Category({
+      title: req.body.title,
+      image: req.file?.filename || null,
+    });
 
     if (!errors.isEmpty()) {
-      // There are errors. Render the form again with sanitized values/error messages.
+      // There are errors
+      // Delete image
+      if (category.image) {
+        fs.unlink(`public/uploads/${category.image}`);
+      }
+
+      // Render the form again with sanitized values/error messages.
       res.render('category_form', {
         title: 'Create New Category',
         category,
@@ -154,6 +184,8 @@ exports.category_update_get = asyncHandler(async (req, res, next) => {
 
 // Handle Category update on POST
 exports.category_update_post = [
+  // Upload image
+  upload.single('image'),
   // Validate and sanitize
   body('title', 'Category title must contain at least 3 characters')
     .trim()
@@ -167,14 +199,20 @@ exports.category_update_post = [
     // Create a category object with escaped and trimmed data, and old id.
     const category = new Category({
       title: req.body.title,
+      image: req.file?.filename || null,
       _id: req.params.id,
     });
 
-    if (!errors.isEmpty()) {
-      // There are errors. Render the form again with sanitized values/error messages.
+    const currentCategory = await Category.findById(req.params.id).exec();
 
+    if (!errors.isEmpty()) {
+      // Delete image
+      if (category.image) {
+        fs.unlink(`public/uploads/${category.image}`);
+      }
+
+      // Render the form again with sanitized values/error messages.
       // Get current category object
-      const currentCategory = await Category.findById(req.params.id).exec();
 
       res.render('category_form', {
         title: `Update Category - ${currentCategory.title}`,
@@ -183,6 +221,11 @@ exports.category_update_post = [
       });
       return;
     } else {
+      // Delete current image
+      if (currentCategory.image) {
+        fs.unlink(`public/uploads/${currentCategory.image}`);
+      }
+
       // Data from form is valid. Update the record
       const updatedCategory = await Category.findByIdAndUpdate(
         req.params.id,

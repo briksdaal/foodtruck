@@ -58,7 +58,6 @@ exports.category_create_post = [
     .escape(),
   // Process request
   asyncHandler(async (req, res, next) => {
-    console.log(req.body);
     // Extract the validation errors from a request.
     const errors = validationResult(req);
     // Create a category object with escaped and trimmed data.
@@ -143,6 +142,10 @@ exports.category_delete_post = asyncHandler(async (req, res, next) => {
     });
     return;
   } else {
+    // Delete image
+    if (category.image) {
+      fs.unlink(`public/uploads/${category.image}`);
+    }
     // Category has no perishable types using it. Delete object and redirect to category list
     await Category.findByIdAndDelete(req.body.categoryid);
     res.redirect('/categories');

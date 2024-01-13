@@ -1,7 +1,9 @@
+const fs = require('fs').promises;
 const CookwareInstance = require('../models/cookwareinstance');
 const Cookware = require('../models/cookware');
 const asyncHandler = require('express-async-handler');
 const { body, validationResult } = require('express-validator');
+const { imageUploadAndValidation } = require('./imageUploadAndValidation');
 
 const sortByTitle = require('../helpers/sortByTitle');
 
@@ -28,6 +30,7 @@ exports.cookwareinstance_detail = asyncHandler(async (req, res, next) => {
     .populate('cookware')
     .exec();
 
+  console.log(cookwareInstance);
   if (cookwareInstance === null) {
     // no results
     const err = new Error('Cookware Not Found');
@@ -53,6 +56,8 @@ exports.cookwareinstance_create_get = asyncHandler(async (req, res, next) => {
 
 // Handle Cookware Instance create on POST
 exports.cookwareinstance_create_post = [
+  // Upload and validate image
+  imageUploadAndValidation,
   // Validate and sanitize
   body('cookware', 'Must choose a cookware type')
     .trim()
@@ -80,11 +85,17 @@ exports.cookwareinstance_create_post = [
       description: req.body.description,
       dateBought: req.body['date-bought'],
       weight: req.body.weight,
+      image: req.file?.filename || null,
       condition: req.body.condition,
     });
 
     if (!errors.isEmpty()) {
-      // There are errors. Render the form again with sanitized values/error messages.
+      // There are errors
+      // Delete image
+      if (cookwareInstance.image) {
+        fs.unlink(`public/uploads/${cookwareInstance.image}`);
+      }
+      // Render the form again with sanitized values/error messages.
       const allCookware = await Cookware.find({}).sort({ title: 1 }).exec();
 
       res.render('cookwareinstance_form', {
@@ -135,6 +146,10 @@ exports.cookwareinstance_delete_post = asyncHandler(async (req, res, next) => {
     return;
   }
 
+  if (cookwareinstance.image) {
+    fs.unlink(`public/uploads/${cookwareinstance.image}`);
+  }
+
   await CookwareInstance.findByIdAndDelete(req.body.cookwareinstanceid);
   res.redirect('/cookwareinstances');
 });
@@ -162,6 +177,8 @@ exports.cookwareinstance_update_get = asyncHandler(async (req, res, next) => {
 
 // Handle Cookware Instance update on POST
 exports.cookwareinstance_update_post = [
+  // Upload and validate image
+  imageUploadAndValidation,
   // Validate and sanitize
   body('cookware', 'Must choose a cookware type')
     .trim()
@@ -190,17 +207,25 @@ exports.cookwareinstance_update_post = [
       dateBought: req.body['date-bought'],
       weight: req.body.weight,
       condition: req.body.condition,
+      image: req.file?.filename || null,
       _id: req.params.id,
     });
 
+    const currentCookwareinstance = await CookwareInstance.findById(
+      req.params.id
+    )
+      .populate('cookware')
+      .exec();
+
     if (!errors.isEmpty()) {
-      // There are errors. Render the form again with sanitized values/error messages.
+      // There are errors
+      // Delete image
+      if (cookwareInstance.image) {
+        fs.unlink(`public/uploads/${cookwareInstance.image}`);
+      }
 
       // Get currrent cookware instance and cookware list for rerender
-      const [currentCookwareinstance, allCookware] = await Promise.all([
-        CookwareInstance.findById(req.params.id).populate('cookware').exec(),
-        Cookware.find({}).sort({ title: 1 }).exec(),
-      ]);
+      const allCookware = await Cookware.find({}).sort({ title: 1 }).exec();
 
       res.render('cookwareinstance_form', {
         title: `Update Cookware - ${currentCookwareinstance.cookware.title} - ${currentCookwareinstance._id}`,
@@ -210,6 +235,11 @@ exports.cookwareinstance_update_post = [
       });
       return;
     } else {
+      // Delete current image
+      if (currentCookwareinstance.image) {
+        fs.unlink(`public/uploads/${currentCookwareinstance.image}`);
+      }
+
       // Data from form is valid. Update the record
       const updatedCookwareInstance = await CookwareInstance.findByIdAndUpdate(
         req.params.id,

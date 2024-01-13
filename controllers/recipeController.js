@@ -4,6 +4,7 @@ const Perishable = require('../models/perishable');
 const asyncHandler = require('express-async-handler');
 const { validationResult } = require('express-validator');
 const { recipePreprocess } = require('./recipePreprocess');
+const { imageUploadAndValidation } = require('./imageUploadAndValidation');
 
 // Display list of all Recipes
 exports.recipe_list = asyncHandler(async (req, res, next) => {
@@ -51,6 +52,8 @@ exports.recipe_create_get = asyncHandler(async (req, res, next) => {
 
 // Handle recipe create on POST
 exports.recipe_create_post = [
+  // Upload and validate image
+  imageUploadAndValidation,
   // Convert relevant fields to arrays, rename fields, validate and sanitize
   recipePreprocess,
   // Process request after validation and sanitization.
@@ -164,6 +167,8 @@ exports.recipe_update_get = asyncHandler(async (req, res, next) => {
 
 // Handle recipe update on POST
 exports.recipe_update_post = [
+  // Upload and validate image
+  imageUploadAndValidation,
   // Convert relevant fields to arrays, rename fields, validate and sanitize
   recipePreprocess,
   // Process request after validation and sanitization.

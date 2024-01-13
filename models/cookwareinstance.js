@@ -13,10 +13,15 @@ const CookwareInstanceSchema = new Schema({
     enum: ['Usable', 'Maintenance', 'No Longer Usable'],
     default: 'Usable',
   },
+  image: { type: String },
 });
 
 CookwareInstanceSchema.virtual('url').get(function () {
   return `/cookwareinstances/${this._id}`;
+});
+
+CookwareInstanceSchema.virtual('imagepath').get(function () {
+  return `/uploads/${this.image}`;
 });
 
 CookwareInstanceSchema.virtual('ddmmyy_dateBought').get(function () {

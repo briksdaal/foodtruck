@@ -2,6 +2,7 @@ const PerishableInstance = require('../models/perishableinstance');
 const Perishable = require('../models/perishable');
 const asyncHandler = require('express-async-handler');
 const { body, validationResult } = require('express-validator');
+const { imageUploadAndValidation } = require('./imageUploadAndValidation');
 
 // Display list of all Perishable Instances
 exports.perishableinstance_list = asyncHandler(async (req, res, next) => {
@@ -56,6 +57,8 @@ exports.perishableinstance_create_get = asyncHandler(async (req, res, next) => {
 
 // Handle Perishable Instance create on POST
 exports.perishableinstance_create_post = [
+  // Upload and validate image
+  imageUploadAndValidation,
   // Validate and sanitize
   body('perishable', 'Must choose a perishable type')
     .trim()
@@ -165,6 +168,8 @@ exports.perishableinstance_update_get = asyncHandler(async (req, res, next) => {
 
 // Handle Perishable Instance update on POST
 exports.perishableinstance_update_post = [
+  // Upload and validate image
+  imageUploadAndValidation,
   // Validate and sanitize
   body('perishable', 'Must choose a perishable type')
     .trim()

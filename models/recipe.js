@@ -20,10 +20,15 @@ const RecipeSchema = new Schema({
     type: [IngredientSchema],
     required: true,
   },
+  image: { type: String },
 });
 
 RecipeSchema.virtual('url').get(function () {
   return `/recipes/${this._id}`;
+});
+
+RecipeSchema.virtual('imagepath').get(function () {
+  return `/uploads/${this.image}`;
 });
 
 module.exports = mongoose.model('Recipe', RecipeSchema);

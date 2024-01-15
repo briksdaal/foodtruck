@@ -1,3 +1,12 @@
+<% if (perishable_instance.image) { %>
+<div class="image-container">
+  <img
+    src="<%= perishable_instance.imagepath %>"
+    alt="<%- perishable_instance.title %>"
+  />
+</div>
+<% } %>
+
 <h3>Perishable Type</h3>
 <p>
   <a href="<%= perishable_instance.perishable.url %>"

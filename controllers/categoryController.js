@@ -1,10 +1,8 @@
-const fs = require('fs').promises;
-var createError = require('http-errors');
 const Category = require('../models/category');
 const Perishable = require('../models/perishable');
 const asyncHandler = require('express-async-handler');
 const { body, validationResult } = require('express-validator');
-const { imageUploadAndValidation } = require('./imageUploadAndValidation');
+const { imageUploadAndValidation, deleteImage } = require('./imageActions');
 
 // Display list of all Categories
 exports.category_list = asyncHandler(async (req, res, next) => {
@@ -69,9 +67,7 @@ exports.category_create_post = [
     if (!errors.isEmpty()) {
       // There are errors
       // Delete image
-      if (category.image) {
-        fs.unlink(`public/uploads/${category.image}`);
-      }
+      deleteImage(category);
 
       // Render the form again with sanitized values/error messages.
       res.render('category_form', {
@@ -143,9 +139,7 @@ exports.category_delete_post = asyncHandler(async (req, res, next) => {
     return;
   } else {
     // Delete image
-    if (category.image) {
-      fs.unlink(`public/uploads/${category.image}`);
-    }
+    deleteImage(category);
     // Category has no perishable types using it. Delete object and redirect to category list
     await Category.findByIdAndDelete(req.body.categoryid);
     res.redirect('/categories');
@@ -194,9 +188,7 @@ exports.category_update_post = [
 
     if (!errors.isEmpty()) {
       // Delete image
-      if (category.image) {
-        fs.unlink(`public/uploads/${category.image}`);
-      }
+      deleteImage(category);
 
       // Render the form again with sanitized values/error messages.
       // Get current category object
@@ -209,9 +201,7 @@ exports.category_update_post = [
       return;
     } else {
       // Delete current image
-      if (currentCategory.image) {
-        fs.unlink(`public/uploads/${currentCategory.image}`);
-      }
+      deleteImage(currentCategory);
 
       // Data from form is valid. Update the record
       const updatedCategory = await Category.findByIdAndUpdate(

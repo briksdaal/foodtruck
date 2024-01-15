@@ -2,7 +2,7 @@ const PerishableInstance = require('../models/perishableinstance');
 const Perishable = require('../models/perishable');
 const asyncHandler = require('express-async-handler');
 const { body, validationResult } = require('express-validator');
-const { imageUploadAndValidation } = require('./imageUploadAndValidation');
+const { imageUploadAndValidation, deleteImage } = require('./imageActions');
 
 // Display list of all Perishable Instances
 exports.perishableinstance_list = asyncHandler(async (req, res, next) => {
@@ -84,10 +84,14 @@ exports.perishableinstance_create_post = [
       placeBought: req.body['place-bought'],
       dateBought: req.body['date-bought'],
       dateLastUse: req.body['date-last-use'],
+      image: req.file?.filename || null,
     });
 
     if (!errors.isEmpty()) {
-      // There are errors. Render the form again with sanitized values/error messages.
+      // There are errors
+      // Delete image
+      deleteImage(perishableInstance);
+      // Render the form again with sanitized values/error messages.
       const allPerishables = await Perishable.find({})
         .sort({ title: 1 })
         .exec();
@@ -139,6 +143,8 @@ exports.perishableinstance_delete_post = asyncHandler(
       res.redirect('perishableinstances');
       return;
     }
+
+    deleteImage(perishableinstance);
 
     await PerishableInstance.findByIdAndDelete(req.body.perishableinstanceid);
     res.redirect('/perishableinstances');
@@ -195,19 +201,26 @@ exports.perishableinstance_update_post = [
       placeBought: req.body['place-bought'],
       dateBought: req.body['date-bought'],
       dateLastUse: req.body['date-last-use'],
+      image: req.file?.filename || null,
       _id: req.params.id,
     });
 
-    if (!errors.isEmpty()) {
-      // There are errors. Render the form again with sanitized values/error messages.
+    // Get currrent perishable instance
+    const currentPerishableinstance = await PerishableInstance.findById(
+      req.params.id
+    )
+      .populate('perishable')
+      .exec();
 
-      // Get currrent perishable instance and perishable list for rerender
-      const [currentPerishableinstance, allPerishables] = await Promise.all([
-        PerishableInstance.findById(req.params.id)
-          .populate('perishable')
-          .exec(),
-        Perishable.find({}).sort({ title: 1 }).exec(),
-      ]);
+    if (!errors.isEmpty()) {
+      // There are errors
+      // Delete image
+      deleteImage(perishableInstance);
+
+      // Get perishable list for rerender
+      const allPerishables = await Perishable.find({})
+        .sort({ title: 1 })
+        .exec();
 
       res.render('perishableinstance_form', {
         title: `Update Perishable - ${currentPerishableinstance.perishable.title} - ${currentPerishableinstance._id}`,
@@ -217,6 +230,9 @@ exports.perishableinstance_update_post = [
       });
       return;
     } else {
+      // Delete current image
+      deleteImage(currentPerishableinstance);
+
       // Data from form is valid. Update the record
       const updatedPerishableInstance =
         await PerishableInstance.findByIdAndUpdate(

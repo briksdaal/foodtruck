@@ -1,3 +1,9 @@
+<% if (recipe.image) { %>
+<div class="image-container">
+  <img src="<%= recipe.imagepath %>" alt="<%- recipe.title %>" />
+</div>
+<% } %>
+
 <h3>Description</h3>
 <p>
   <% if (recipe.description) { %> <%- recipe.description %> <% } else { %> No

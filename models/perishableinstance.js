@@ -16,10 +16,15 @@ const PerishableInstanceSchema = new Schema({
     type: Date,
     default: () => Date.now() + 7 * 24 * 60 * 60 * 1000,
   },
+  image: { type: String },
 });
 
 PerishableInstanceSchema.virtual('url').get(function () {
   return `/perishableinstances/${this._id}`;
+});
+
+PerishableInstanceSchema.virtual('imagepath').get(function () {
+  return `/uploads/${this.image}`;
 });
 
 PerishableInstanceSchema.virtual('ddmmyy_dateBought').get(function () {

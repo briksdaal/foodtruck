@@ -1,3 +1,5 @@
+const fs = require('fs');
+const path = require('path');
 const FileType = require('file-type');
 const { buildCheckFunction } = require('express-validator');
 const multer = require('multer');
@@ -19,3 +21,9 @@ exports.imageUploadAndValidation = [
     }
   }),
 ];
+
+exports.deleteImage = (modelObject) => {
+  if (modelObject.image) {
+    fs.unlink(`public/uploads/${modelObject.image}`, (err) => null);
+  }
+};

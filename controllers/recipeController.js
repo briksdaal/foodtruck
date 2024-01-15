@@ -4,7 +4,7 @@ const Perishable = require('../models/perishable');
 const asyncHandler = require('express-async-handler');
 const { validationResult } = require('express-validator');
 const { recipePreprocess } = require('./recipePreprocess');
-const { imageUploadAndValidation } = require('./imageUploadAndValidation');
+const { imageUploadAndValidation, deleteImage } = require('./imageActions');
 
 // Display list of all Recipes
 exports.recipe_list = asyncHandler(async (req, res, next) => {
@@ -75,12 +75,15 @@ exports.recipe_create_post = [
       cookware: cookware,
       ingredients: ingredients,
       instructions: req.body.instructions,
+      image: req.file?.filename || null,
     });
 
     if (!errors.isEmpty()) {
-      // There are errors. Render form again with sanitized values/error messages.
+      // There are errors
+      // Delete image
+      deleteImage(recipe);
 
-      // Get all perishables and cookware for form.
+      // Render form again with sanitized values/error messages.
       const [allPerishables, allCookware] = await Promise.all([
         Perishable.find({}).sort({ title: 1 }).exec(),
         Cookware.find({}).sort({ title: 1 }).exec(),
@@ -138,6 +141,8 @@ exports.recipe_delete_post = asyncHandler(async (req, res, next) => {
     return;
   }
 
+  deleteImage(recipe);
+
   await Recipe.findByIdAndDelete(req.body.recipeid);
   res.redirect('/recipes');
 });
@@ -192,15 +197,20 @@ exports.recipe_update_post = [
       cookware: cookware,
       ingredients: ingredients,
       instructions: instructions,
+      image: req.file?.filename || null,
       _id: req.params.id,
     });
 
-    if (!errors.isEmpty()) {
-      // There are errors. Render form again with sanitized values/error messages.
+    // Get currrent recipe
+    const currentRecipe = await Recipe.findById(req.params.id).exec();
 
-      // Get currrent recipe and cookware and perishable lists for rerender
-      const [currentRecipe, allPerishables, allCookware] = await Promise.all([
-        Recipe.findById(req.params.id).exec(),
+    if (!errors.isEmpty()) {
+      // There are errors
+      // Delete image
+      deleteImage(recipe);
+
+      // Get perishable and cookware lists for rerender
+      const [allPerishables, allCookware] = await Promise.all([
         Perishable.find({}).sort({ title: 1 }).exec(),
         Cookware.find({}).sort({ title: 1 }).exec(),
       ]);
@@ -214,7 +224,9 @@ exports.recipe_update_post = [
       });
       return;
     } else {
-      console.log(recipe);
+      // Delete current image
+      deleteImage(currentRecipe);
+
       // Data from form is valid. Update the record
       const updatedRecipe = await Recipe.findByIdAndUpdate(
         req.params.id,

@@ -5,6 +5,8 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var debug = require('debug')('foodtruck:db');
 var logger = require('morgan');
+var compression = require('compression');
+var helmet = require('helmet');
 require('dotenv').config();
 
 var indexRouter = require('./routes/index');
@@ -35,6 +37,17 @@ async function main() {
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+
+const RateLimit = require('express-rate-limit');
+const limiter = RateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 20,
+});
+// Apply rate limiter to all requests
+app.use(limiter);
+
+app.use(compression()); // Compress all routes
+app.use(helmet());
 app.use(expressLayouts);
 
 app.use(logger('dev'));
